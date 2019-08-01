@@ -56,11 +56,11 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     ADD startup.jl /opt/julia/config/startup.jl
     ADD startup.jl /home/jupyter/.julia/config/startup.jl
     
-    USER jupyter
     RUN rm -rf .projects
     ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
     HOME=/home/$NB_USER
     WORKDIR $HOME
+    
     USER root
-    RUN chown -R jupyter /home/jupyter
+    RUN chown -R jupyter /home/jupyter/.julia
     USER jupyter
