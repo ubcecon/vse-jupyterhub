@@ -53,7 +53,7 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
         NB_UID=9999
     ENV HOME=/home/$NB_USER
     # Configure the JULIA_DEPOT_PATH
-    ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/home/jovyan/.julia:/opt/julia"
+    ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/opt/julia"
     RUN rm -rf .projects
     ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
     HOME=/home/$NB_USER
