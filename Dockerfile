@@ -29,20 +29,20 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     # PackageCompiler 
     RUN julia -e "using Pkg; pkg\"add IJulia InstantiateFromURL Plots Images DiffEqBase DataFrames Parameters Distributions DualNumbers Expectations Unitful Compat NLsolve LaTeXStrings UnicodePlots DataValues IterativeSolvers Interpolations VisualRegressionTests\"" 
     RUN julia -e "using Pkg; pkg\"add PackageCompiler\""
-    RUN julia -e "using PackageCompiler; compile_package(\"Plots\")"
+    RUN julia -e "using PackageCompiler; compile_package(\"Plots\", force = true)"
 
+    # Jupyter user setup 
+    RUN useradd -m -s /bin/bash -N -u 9999 jupyter
     RUN chown -R jupyter /home/jupyter/
-    RUN chown -R jupyter /home/jovyan/
-    RUN mv $HOME/.local/share/jupyter/kernels/julia-1.1 $CONDA_DIR/share/jupyter/kernels/ \
-    && chmod -R go+rx $CONDA_DIR/share/jupyter \
-    && rm -rf $HOME/.local \
+    RUN chown -R jupyter /home/jovyan/ && \ 
+    chmod -R go+rx $CONDA_DIR/share/jupyter && \
+    rm -rf $HOME/.local && \
     # Nuke the registry that came with Julia.
-    && rm -rf /opt/julia-1.1.0/local/share/julia/registries \
+    rm -rf /opt/julia-1.1.0/local/share/julia/registries 
     # Nuke the registry that Jovyan uses.
-    && rm -rf $HOME/.julia/registries
 
     # Give the user read and execute permissions over /jovyan/.julia.
-    RUN chmod -R go+rx /home/jovyan/.julia
+    RUN chmod -R go+rx /opt/julia
 
     # Add a startup.jl to copy
     ADD startup.jl /opt/julia/etc/julia
@@ -55,5 +55,7 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     # Configure the JULIA_DEPOT_PATH
     ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/home/jovyan/.julia:/opt/julia"
     RUN rm -rf .projects
-
+    ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
+    HOME=/home/$NB_USER
+    WORKDIR $HOME
 
