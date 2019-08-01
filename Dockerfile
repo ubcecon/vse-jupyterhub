@@ -55,7 +55,8 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/opt/julia"
     ADD startup.jl /opt/julia/config/startup.jl
     ADD startup.jl /home/jupyter/.julia/config/startup.jl
-    ADD startup.jl /opt/julia/packages/PackageCompiler/CJQcs/startup.jl
+    RUN rm /opt/julia/packages/PackageCompiler/CJQcs/Project.toml && rm /opt/julia/packages/PackageCompiler/CJQcs/Manifest.toml 
+    RUN ln -fs /opt/julia/packages/PackageCompiler/CJQcs/Project.toml /home/jupyter/.julia/environments/v1.1/Project.toml 
     
     RUN rm -rf .projects
     ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
@@ -65,6 +66,5 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     USER root
     RUN julia /home/jupyter/.julia/config/startup.jl 
     RUN chown -R jupyter /home/jupyter/.julia
-    RUN chown -R jupyter /opt/julia/packages/PackageCompiler/CJQcs
     USER jupyter
     RUN julia -e "using Pkg; pkg\"add IJulia\"; pkg\"build IJulia\""
