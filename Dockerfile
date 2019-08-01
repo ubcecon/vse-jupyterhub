@@ -28,7 +28,7 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
 
     # PackageCompiler 
     RUN julia -e "using Pkg; pkg\"add IJulia InstantiateFromURL Plots Images DiffEqBase DataFrames Parameters Distributions DualNumbers Expectations Unitful Compat NLsolve LaTeXStrings UnicodePlots DataValues IterativeSolvers Interpolations VisualRegressionTests\"" 
-    RUN julia -e "using Pkg; pkg\"add PackageCompiler\""
+    RUN julia -e "using Pkg; pkg\"dev PackageCompiler\""
     RUN julia -e "using PackageCompiler; compile_package(\"Plots\", force = true)"
 
     # Jupyter user setup 
@@ -62,5 +62,7 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     WORKDIR $HOME
     
     USER root
+    RUN julia /home/jupyter/.julia/config/startup.jl 
     RUN chown -R jupyter /home/jupyter/.julia
     USER jupyter
+    RUN julia -e "using Pkg; pkg\"add IJulia\"; pkg\"build IJulia\""
