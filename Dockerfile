@@ -51,7 +51,8 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     ENV NB_USER=jupyter \
         NB_UID=9999
     ENV HOME=/home/$NB_USER
-    
+   
+     
     # Configure the JULIA_DEPOT_PATH
     ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/opt/julia"
     ADD startup.jl /opt/julia-1.1.0/etc/julia/startup.jl    
@@ -61,4 +62,5 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     WORKDIR $HOME
     USER root
     RUN chown -R jupyter /home/jupyter/.julia
+    RUN conda install -c conda-forge nbgitpuller
     USER jupyter
