@@ -23,12 +23,12 @@ USER root
 RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
 
 # Fix Julia kernel  
-    # QuantEcon packages 
-    RUN julia -e "using InstantiateFromURL; activate_github(\"QuantEcon/QuantEconLecturePackages\", add_default_environment = true)"
-    RUN julia -e "using InstantiateFromURL; activate_github(\"QuantEcon/QuantEconLectureAllPackages\", add_default_environment = true)"
-
+    # grab github_project 
+    RUN julia -e "using Pkg; pkg\"up InstantiateFromURL\""
+    # QuantEcon stuff
+    RUN julia -e "using InstantiateFromURL; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.2.0\"); InstantiateFromURL.packages_to_default_environment()"
     # PackageCompiler 
-    RUN julia -e "using Pkg; pkg\"add IJulia InstantiateFromURL Plots Images DiffEqBase DataFrames Parameters Distributions DualNumbers Expectations Unitful Compat NLsolve LaTeXStrings UnicodePlots DataValues IterativeSolvers Interpolations VisualRegressionTests\"" 
+    RUN julia -e "using Pkg; pkg\"add IJulia Plots Images DiffEqBase DataFrames Parameters Distributions DualNumbers Expectations Unitful Compat NLsolve LaTeXStrings UnicodePlots DataValues IterativeSolvers Interpolations VisualRegressionTests\"" 
     RUN julia -e "using Pkg; pkg\"dev PackageCompiler\""
     RUN julia -e "using PackageCompiler; compile_package(\"Plots\", force = true)"
 
