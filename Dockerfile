@@ -30,8 +30,8 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     # PackageCompiler 
     RUN julia -e "using Pkg; pkg\"add IJulia Plots Images DiffEqBase DataFrames Parameters Distributions DualNumbers Expectations Unitful Compat NLsolve LaTeXStrings UnicodePlots DataValues IterativeSolvers Interpolations VisualRegressionTests\"" 
     RUN julia -e "using Pkg; pkg\"dev PackageCompiler\""
-    RUN julia -e "using PackageCompiler; compile_package(\"Plots\", force = true)"
-
+    RUN julia -e "using PackageCompiler; compile_package(\"Plots\", force = true)" 
+    RUN julia -e "using Pkg; pkg\"precompile\""    
     # Jupyter user setup 
     RUN useradd -m -s /bin/bash -N -u 9999 jupyter
     RUN chown -R jupyter /home/jupyter/
