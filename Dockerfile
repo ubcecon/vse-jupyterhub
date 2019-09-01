@@ -116,7 +116,7 @@ RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeX
     chmod -R go+rx $CONDA_DIR/share/jupyter && \
     rm -rf $HOME/.local && \
     # Nuke the registry that came with Julia.
-    rm -rf /opt/julia-1.1.0/local/share/julia/registries 
+    rm -rf /opt/julia-1.2.0/local/share/julia/registries 
     # Nuke the registry that Jovyan uses.
 
     # Give the user read and execute permissions over /jovyan/.julia.
@@ -131,8 +131,8 @@ RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeX
    
     # Configure the JULIA_DEPOT_PATH
     ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/opt/julia"
-    ADD startup.jl /opt/julia-1.1.0/etc/julia/startup.jl    
-    RUN julia /opt/julia-1.1.0/etc/julia/startup.jl
+    ADD startup.jl /opt/julia-1.2.0/etc/julia/startup.jl    
+    RUN julia /opt/julia-1.2.0/etc/julia/startup.jl
     ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
     HOME=/home/$NB_USER
     WORKDIR $HOME
