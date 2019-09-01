@@ -101,7 +101,7 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
 
 # Fix Julia kernel  
     # grab github_project 
-    RUN julia -e "using Pkg; pkg\"up InstantiateFromURL\""
+    RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
     # QuantEcon stuff
     RUN julia -e "using InstantiateFromURL; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.2.0\"); InstantiateFromURL.packages_to_default_environment()"
     # PackageCompiler 
