@@ -1,4 +1,4 @@
-FROM jupyter/jupyter/scipy-notebook:latest
+FROM jupyter/scipy-notebook:latest
 ARG OPENBLAS_CORETYPE=HASWELL
 ENV NB_USER=jovyan
 ENV HOME=/home/$NB_USER
