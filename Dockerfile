@@ -105,9 +105,9 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
     # QuantEcon stuff
     RUN julia -e "using InstantiateFromURL; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.2.0\"); InstantiateFromURL.packages_to_default_environment()"
     # PackageCompiler 
-    RUN julia -e "using Pkg; pkg\"add IJulia Plots Images DiffEqBase DataFrames Parameters Distributions DualNumbers Expectations Unitful Compat NLsolve LaTeXStrings UnicodePlots DataValues IterativeSolvers Interpolations VisualRegressionTests\"" 
-    RUN julia -e "using Pkg; pkg\"dev PackageCompiler\""
-    RUN julia -e "using PackageCompiler; compile_package(\"Plots\", force = true)" 
+    RUN julia -e "using Pkg; pkg\"add GR Plots StatsPlots DataFrames StatsPlots CSV PlotUtils GeometryTypes Tables PackageCompiler#sd-notomls CategoricalArrays IteratorInterfaceExtensions PooledArrays WeakRefStrings\""    
+RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests\"" 
+    RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, :DataFrames, :CSV, :StatsPlots, install = true); cp(syso, sysold, force = true)" 
     RUN julia -e "using Pkg; pkg\"precompile\""    
     # Jupyter user setup 
     RUN useradd -m -s /bin/bash -N -u 9999 jupyter
