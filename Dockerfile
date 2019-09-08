@@ -85,7 +85,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     sagemath \
     sagemath-jupyter \ 
-    subversion
+    subversion \ 
+    python-pandas
 
 #RUN conda install --quiet --yes \
 #    'r-base=3.4.1' \
