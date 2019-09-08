@@ -101,43 +101,43 @@ USER root
 RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
 
 # Fix Julia kernel  
-    # grab github_project 
-    RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
-    # QuantEcon stuff
-    RUN julia -e "using InstantiateFromURL; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.2.0\"); InstantiateFromURL.packages_to_default_environment()"
-    # PackageCompiler 
-    RUN julia -e "using Pkg; pkg\"add GR Plots StatsPlots DataFrames StatsPlots CSV PlotUtils GeometryTypes Tables PackageCompiler#sd-notomls CategoricalArrays IteratorInterfaceExtensions PooledArrays WeakRefStrings\""    
+# grab github_project 
+RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
+# QuantEcon stuff
+RUN julia -e "using InstantiateFromURL; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.2.0\"); InstantiateFromURL.packages_to_default_environment()"
+# PackageCompiler 
+RUN julia -e "using Pkg; pkg\"add GR Plots StatsPlots DataFrames StatsPlots CSV PlotUtils GeometryTypes Tables PackageCompiler#sd-notomls CategoricalArrays IteratorInterfaceExtensions PooledArrays WeakRefStrings\""    
 RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests\"" 
-    RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, :DataFrames, :CSV, :StatsPlots, install = true); cp(syso, sysold, force = true)" 
-    RUN julia -e "using Pkg; pkg\"precompile\""    
-    # Jupyter user setup 
-    RUN useradd -m -s /bin/bash -N -u 9999 jupyter
-    RUN chown -R jupyter /home/jupyter/
-    RUN chown -R jupyter /home/jovyan/ && \ 
-    chmod -R go+rx $CONDA_DIR/share/jupyter && \
-    rm -rf $HOME/.local && \
-    # Nuke the registry that came with Julia.
-    rm -rf /opt/julia-1.2.0/local/share/julia/registries 
-    # Nuke the registry that Jovyan uses.
+RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, :DataFrames, :CSV, :StatsPlots, install = true); cp(syso, sysold, force = true)" 
+RUN julia -e "using Pkg; pkg\"precompile\""    
+# Jupyter user setup 
+RUN useradd -m -s /bin/bash -N -u 9999 jupyter
+RUN chown -R jupyter /home/jupyter/
+RUN chown -R jupyter /home/jovyan/ && \ 
+chmod -R go+rx $CONDA_DIR/share/jupyter && \
+rm -rf $HOME/.local && \
+# Nuke the registry that came with Julia.
+rm -rf /opt/julia-1.2.0/local/share/julia/registries 
+# Nuke the registry that Jovyan uses.
 
-    # Give the user read and execute permissions over /jovyan/.julia.
-    RUN chmod -R go+rx /opt/julia
-    # Add a startup.jl to copy
-    USER jupyter
-     
-    # Configure environment
-    ENV NB_USER=jupyter \
-        NB_UID=9999
-    ENV HOME=/home/$NB_USER
-   
-    # Configure the JULIA_DEPOT_PATH
-    ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/opt/julia"
-    ADD startup.jl /opt/julia-1.2.0/etc/julia/startup.jl    
-    RUN julia /opt/julia-1.2.0/etc/julia/startup.jl
-    ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
-    HOME=/home/$NB_USER
-    WORKDIR $HOME
-    USER root
-    RUN chown -R jupyter /home/jupyter/.julia
-    RUN conda install -c conda-forge nbgitpuller
-    USER jupyter
+# Give the user read and execute permissions over /jovyan/.julia.
+RUN chmod -R go+rx /opt/julia
+# Add a startup.jl to copy
+USER jupyter
+    
+# Configure environment
+ENV NB_USER=jupyter \
+    NB_UID=9999
+ENV HOME=/home/$NB_USER
+
+# Configure the JULIA_DEPOT_PATH
+ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/opt/julia"
+ADD startup.jl /opt/julia-1.2.0/etc/julia/startup.jl    
+RUN julia /opt/julia-1.2.0/etc/julia/startup.jl
+ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
+HOME=/home/$NB_USER
+WORKDIR $HOME
+USER root
+RUN chown -R jupyter /home/jupyter/.julia
+RUN conda install -c conda-forge nbgitpuller
+USER jupyter
