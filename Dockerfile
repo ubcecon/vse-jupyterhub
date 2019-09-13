@@ -123,8 +123,17 @@ rm -rf /opt/julia-1.2.0/local/share/julia/registries
 # Give the user read and execute permissions over /jovyan/.julia.
 RUN chmod -R go+rx /opt/julia
 # Add a startup.jl to copy
+
 USER jupyter
-    
+# Jupyterhub Stuff
+RUN conda install -c conda-forge nodejs && \ 
+    pip install jupyterlab-quickopen && \ 
+    jupyter labextension install @jupyterlab/toc  --no-build && \ 
+    jupyter labextension install @parente/jupyterlab-quickopen  --no-build && \ 
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \ 
+    jupyter lab build --dev-build=False && \ 
+    npm cache clean --force && \ 
+        
 # Configure environment
 ENV NB_USER=jupyter \
     NB_UID=9999
