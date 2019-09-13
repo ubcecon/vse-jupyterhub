@@ -132,7 +132,7 @@ RUN conda install -c conda-forge nodejs && \
     jupyter labextension install @parente/jupyterlab-quickopen  --no-build && \ 
     jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \ 
     jupyter lab build --dev-build=False && \ 
-    npm cache clean --force && \ 
+    npm cache clean --force
         
 # Configure environment
 ENV NB_USER=jupyter \
