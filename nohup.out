@@ -1,0 +1,2739 @@
+Sending build context to Docker daemon  261.1kB
+Step 1/44 : FROM jupyter/scipy-notebook:latest
+ ---> 844815ed865e
+Step 2/44 : ARG OPENBLAS_CORETYPE=HASWELL
+ ---> Using cache
+ ---> 506656d8d3bc
+Step 3/44 : ENV NB_USER=jovyan
+ ---> Using cache
+ ---> cc9fb97a5733
+Step 4/44 : ENV HOME=/home/$NB_USER
+ ---> Using cache
+ ---> 461e11dcec04
+Step 5/44 : USER root
+ ---> Using cache
+ ---> 550a64bdf4cc
+Step 6/44 : RUN apt-get update &&     apt-get install -y --no-install-recommends     fonts-dejavu     gfortran     gcc &&     rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> ebf2f74e49df
+Step 7/44 : ENV JULIA_DEPOT_PATH=/opt/julia
+ ---> Using cache
+ ---> ab36222a7ef0
+Step 8/44 : ENV JULIA_PKGDIR=/opt/julia
+ ---> Using cache
+ ---> f52e27aea410
+Step 9/44 : ENV JULIA_VERSION=1.2.0
+ ---> Using cache
+ ---> 92b033b1794d
+Step 10/44 : RUN mkdir /opt/julia-${JULIA_VERSION} &&     cd /tmp &&     wget -q https://julialang-s3.julialang.org/bin/linux/x64/`echo ${JULIA_VERSION} | cut -d. -f 1,2`/julia-${JULIA_VERSION}-linux-x86_64.tar.gz &&     echo "926ced5dec5d726ed0d2919e849ff084a320882fb67ab048385849f9483afc47 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - &&     tar xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia-${JULIA_VERSION} --strip-components=1 &&     rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
+ ---> Using cache
+ ---> 3ad201deea98
+Step 11/44 : RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
+ ---> Using cache
+ ---> 68c61db0048d
+Step 12/44 : RUN mkdir /etc/julia &&     echo "push!(Libdl.DL_LOAD_PATH, \"$CONDA_DIR/lib\")" >> /etc/julia/juliarc.jl &&     mkdir $JULIA_PKGDIR &&     chown $NB_USER $JULIA_PKGDIR &&     fix-permissions $JULIA_PKGDIR
+ ---> Using cache
+ ---> 2ca7bc92a29d
+Step 13/44 : USER $NB_UID
+ ---> Using cache
+ ---> a5932ecebf7d
+Step 14/44 : RUN conda install --quiet --yes     'r-base=3.6.1'     'r-caret=6.0*'     'r-crayon=1.3*'     'r-devtools=2.1*'     'r-forecast=8.7*'     'r-hexbin=1.27*'     'r-htmltools=0.3*'     'r-htmlwidgets=1.3*'     'r-irkernel=1.0*'     'r-nycflights13=1.0*'     'r-plyr=1.8*'     'r-randomforest=4.6*'     'r-rcurl=1.95*'     'r-reshape2=1.4*'     'r-rmarkdown=1.14*'     'r-rsqlite=2.1*'     'r-shiny=1.3*'     'r-sparklyr=1.0*'     'r-tidyverse=1.2*'     'rpy2=2.9*'     &&     conda clean --all -f -y &&     fix-permissions $CONDA_DIR &&     fix-permissions /home/$NB_USER
+ ---> Using cache
+ ---> 14f8f3e9def8
+Step 15/44 : RUN julia -e 'import Pkg; Pkg.update()' &&     (test $TEST_ONLY_BUILD || julia -e 'import Pkg; Pkg.add("HDF5")') &&     julia -e "using Pkg; pkg\"add IJulia\"; pkg\"precompile\"" &&     mv $HOME/.local/share/jupyter/kernels/julia* $CONDA_DIR/share/jupyter/kernels/ &&     chmod -R go+rx $CONDA_DIR/share/jupyter &&     rm -rf $HOME/.local &&     fix-permissions $JULIA_PKGDIR $CONDA_DIR/share/jupyter
+ ---> Using cache
+ ---> f43786a1ec7c
+Step 16/44 : USER root
+ ---> Using cache
+ ---> 58a1c8e362e3
+Step 17/44 : RUN apt-get update &&     apt-get install -y --no-install-recommends     sagemath     sagemath-jupyter     subversion     python-pandas
+ ---> Using cache
+ ---> 58237baf8400
+Step 18/44 : ENV CPATH=$CONDA_DIR/include
+ ---> Using cache
+ ---> 760658409ca9
+Step 19/44 : USER root
+ ---> Using cache
+ ---> f03b5f31a538
+Step 20/44 : RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
+ ---> Using cache
+ ---> 1566992f9af1
+Step 21/44 : RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
+ ---> Using cache
+ ---> 503792c8e6ff
+Step 22/44 : RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); pkg\"add OffsetArrays DiffEqBase DiffEqCallbacks DiffEqJump DifferentialEquations StochasticDiffEq IteratorInterfaceExtensions DiffEqOperators\"; InstantiateFromURL.packages_to_default_environment()"
+ ---> Running in f076db851b12
+Activating environment at `~/Project.toml`
+  Updating registry at `/opt/julia/registries/General`
+  Updating git-repo `https://github.com/JuliaRegistries/General.git`
+[?25l    Fetching: [>                                        ]  0.0 %[2K[?25h Installed DataAPI ───────────────────── v1.0.1
+ Installed PDMats ────────────────────── v0.9.9
+ Installed TableTraits ───────────────── v1.0.0
+ Installed LeastSquaresOptim ─────────── v0.7.2
+ Installed BlockArrays ───────────────── v0.9.1
+ Installed ProtoBuf ──────────────────── v0.7.0
+ Installed DataVoyager ───────────────── v0.3.1
+ Installed Tracker ───────────────────── v0.2.3
+ Installed NLSolversBase ─────────────── v7.4.1
+ Installed Zygote ────────────────────── v0.3.4
+ Installed CSV ───────────────────────── v0.5.12
+ Installed NodeJS ────────────────────── v0.6.0
+ Installed QuantEcon ─────────────────── v0.16.2
+ Installed Electron ──────────────────── v1.0.0
+ Installed SpatialIndexing ───────────── v0.1.2
+ Installed OffsetArrays ──────────────── v0.11.1
+ Installed ForwardDiff ───────────────── v0.10.3
+ Installed LoweredCodeUtils ──────────── v0.3.8
+ Installed DoubleFloats ──────────────── v0.9.8
+ Installed QueryTables ───────────────── v0.1.0
+ Installed GLM ───────────────────────── v1.3.1
+ Installed Combinatorics ─────────────── v0.7.0
+ Installed TableTraitsUtils ──────────── v1.0.0
+ Installed ShiftedArrays ─────────────── v0.5.0
+ Installed ParquetFiles ──────────────── v0.2.0
+ Installed Media ─────────────────────── v0.5.0
+ Installed BandedMatrices ────────────── v0.10.1
+ Installed NLopt ─────────────────────── v0.5.1
+ Installed FixedEffectModels ─────────── v0.8.2
+ Installed QueryOperators ────────────── v0.9.1
+ Installed Juno ──────────────────────── v0.7.2
+ Installed ArrayInterface ────────────── v1.2.1
+ Installed AbstractTrees ─────────────── v0.2.1
+ Installed FFTW ──────────────────────── v0.3.0
+ Installed DataValues ────────────────── v0.4.12
+ Installed Revise ────────────────────── v2.1.6
+ Installed GeometryTypes ─────────────── v0.7.6
+ Installed CSVFiles ──────────────────── v0.16.0
+ Installed PlotUtils ─────────────────── v0.5.8
+ Installed MacroTools ────────────────── v0.5.1
+ Installed Flux ──────────────────────── v0.8.3
+ Installed Missings ──────────────────── v0.4.2
+ Installed Inflate ───────────────────── v0.1.1
+ Installed LineSearches ──────────────── v7.0.1
+ Installed Contour ───────────────────── v0.5.1
+ Installed DataFrames ────────────────── v0.19.1
+ Installed MemPool ───────────────────── v0.2.0
+ Installed ReadStat ──────────────────── v0.4.1
+ Installed Colors ────────────────────── v0.9.6
+ Installed StatsFuns ─────────────────── v0.8.0
+ Installed BlackBoxOptim ─────────────── v0.5.0
+ Installed ExponentialUtilities ──────── v1.5.1
+ Installed Measures ──────────────────── v0.3.0
+ Installed VegaLite ──────────────────── v0.7.0
+ Installed Requires ──────────────────── v0.5.2
+ Installed FeatherFiles ──────────────── v0.8.1
+ Installed Snappy ────────────────────── v0.3.0
+ Installed RDatasets ─────────────────── v0.6.3
+ Installed FeatherLib ────────────────── v0.2.0
+ Installed ExcelFiles ────────────────── v1.0.0
+ Installed GenericSVD ────────────────── v0.2.1
+ Installed IterableTables ────────────── v0.11.0
+ Installed JuMP ──────────────────────── v0.20.0
+ Installed JuliaInterpreter ──────────── v0.6.1
+ Installed TextParse ─────────────────── v0.9.1
+ Installed NNlib ─────────────────────── v0.6.0
+ Installed Calculus ──────────────────── v0.4.1
+ Installed RData ─────────────────────── v0.6.2
+ Installed TableShowUtils ────────────── v0.2.5
+ Installed RegressionTables ──────────── v0.2.2
+ Installed DataStructures ────────────── v0.15.0
+ Installed IterativeSolvers ──────────── v0.8.1
+ Installed PkgTemplates ──────────────── v0.6.2
+ Installed XLSX ──────────────────────── v0.5.5
+ Installed FixedPointNumbers ─────────── v0.6.1
+ Installed FillArrays ────────────────── v0.6.4
+ Installed Crayons ───────────────────── v4.0.0
+ Installed TranscodingStreams ────────── v0.9.5
+ Installed CodecZlib ─────────────────── v0.5.2
+ Installed SparseDiffTools ───────────── v0.8.0
+ Installed JSON ──────────────────────── v0.20.0
+ Installed Mocking ───────────────────── v0.7.0
+ Installed DSP ───────────────────────── v0.6.0
+ Installed StatsModels ───────────────── v0.6.3
+ Installed DataFramesMeta ────────────── v0.5.0
+ Installed QuadGK ────────────────────── v2.1.0
+ Installed MathOptInterface ──────────── v0.9.2
+ Installed Primes ────────────────────── v0.4.0
+ Installed Distances ─────────────────── v0.8.2
+ Installed PositiveFactorizations ────── v0.2.2
+ Installed SpecialFunctions ──────────── v0.7.2
+ Installed ProgressMeter ─────────────── v1.0.0
+ Installed FastClosures ──────────────── v0.3.1
+ Installed Optim ─────────────────────── v0.19.1
+ Installed BlockBandedMatrices ───────── v0.4.6
+ Installed CommonSubexpressions ──────── v0.2.0
+ Installed NearestNeighbors ──────────── v0.4.3
+ Installed Arrow ─────────────────────── v0.2.3
+ Installed FixedEffects ──────────────── v0.1.2
+ Installed Adapt ─────────────────────── v1.0.0
+ Installed Tokenize ──────────────────── v0.5.6
+ Installed AxisAlgorithms ────────────── v1.0.0
+ Installed PooledArrays ──────────────── v0.5.2
+ Installed Reexport ──────────────────── v0.2.0
+ Installed JSONSchema ────────────────── v0.1.1
+ Installed StringEncodings ───────────── v0.3.1
+ Installed TimerOutputs ──────────────── v0.5.0
+ Installed Krylov ────────────────────── v0.3.0
+ Installed Rmath ─────────────────────── v0.5.0
+ Installed LinearMaps ────────────────── v2.5.1
+ Installed VertexSafeGraphs ──────────── v0.1.0
+ Installed Observables ───────────────── v0.2.3
+ Installed IterTools ─────────────────── v1.2.0
+ Installed Tables ────────────────────── v0.2.11
+ Installed FilePaths ─────────────────── v0.8.0
+ Installed Parquet ───────────────────── v0.3.0
+ Installed DiffRules ─────────────────── v0.0.10
+ Installed Roots ─────────────────────── v0.8.1
+ Installed DiffEqDiffTools ───────────── v0.14.0
+ Installed Distributions ─────────────── v0.21.0
+ Installed FastGaussQuadrature ───────── v0.3.3
+ Installed FFMPEG ────────────────────── v0.2.2
+ Installed TimeZones ─────────────────── v0.10.0
+ Installed LinearOperators ───────────── v0.5.4
+ Installed RecursiveArrayTools ───────── v0.18.6
+ Installed CodeTracking ──────────────── v0.5.8
+ Installed NaNMath ───────────────────── v0.3.2
+ Installed Queryverse ────────────────── v0.3.1
+ Installed SimpleTraits ──────────────── v0.9.0
+ Installed Quadmath ──────────────────── v0.5.0
+ Installed Parameters ────────────────── v0.10.3
+ Installed SortingAlgorithms ─────────── v0.3.1
+ Installed Query ─────────────────────── v0.12.1
+ Installed BenchmarkTools ────────────── v0.4.2
+ Installed EzXML ─────────────────────── v0.9.4
+ Installed CPUTime ───────────────────── v1.0.0
+ Installed ZygoteRules ───────────────── v0.1.0
+ Installed Formatting ────────────────── v0.4.0
+ Installed MatrixFactorizations ──────── v0.1.0
+ Installed ColorTypes ────────────────── v0.8.0
+ Installed ArnoldiMethod ─────────────── v0.0.4
+ Installed PlotThemes ────────────────── v0.3.0
+ Installed Ipopt ─────────────────────── v0.6.0
+ Installed Arpack ────────────────────── v0.3.1
+ Installed Showoff ───────────────────── v0.3.1
+ Installed AbstractFFTs ──────────────── v0.4.1
+ Installed Mustache ──────────────────── v0.5.13
+ Installed StatsBase ─────────────────── v0.31.0
+ Installed ExcelReaders ──────────────── v0.11.0
+ Installed GenericSchur ──────────────── v0.2.3
+ Installed Polynomials ───────────────── v0.5.2
+ Installed IRTools ───────────────────── v0.2.3
+ Installed Plots ─────────────────────── v0.26.3
+ Installed DataValueInterfaces ───────── v1.0.0
+ Installed InvertedIndices ───────────── v1.0.0
+ Installed CSTParser ─────────────────── v0.6.2
+ Installed Widgets ───────────────────── v0.6.2
+ Installed MathProgBase ──────────────── v0.7.7
+ Installed PyCall ────────────────────── v1.91.2
+ Installed KernelDensity ─────────────── v0.5.1
+ Installed FilePathsBase ─────────────── v0.6.2
+ Installed FlatBuffers ───────────────── v0.5.3
+ Installed RecipesBase ───────────────── v0.7.0
+ Installed WeakRefStrings ────────────── v0.6.1
+ Installed StatFiles ─────────────────── v0.8.0
+ Installed LaTeXStrings ──────────────── v1.0.3
+ Installed StatsPlots ────────────────── v0.12.0
+ Installed Expectations ──────────────── v1.1.0
+ Installed Ratios ────────────────────── v0.3.1
+ Installed LightGraphs ───────────────── v1.3.0
+ Installed StaticArrays ──────────────── v0.11.0
+ Installed DiffResults ───────────────── v0.0.4
+ Installed ZipFile ───────────────────── v0.8.3
+ Installed IteratorInterfaceExtensions ─ v1.0.0
+ Installed Interpolations ────────────── v0.12.2
+ Installed Thrift ────────────────────── v0.6.0
+ Installed CategoricalArrays ─────────── v0.5.5
+ Installed NLsolve ───────────────────── v4.0.0
+ Installed WoodburyMatrices ──────────── v0.4.1
+ Installed LazyArrays ────────────────── v0.10.0
+ Installed Dierckx ───────────────────── v0.4.1
+ Installed Clustering ────────────────── v0.13.3
+ Installed Nullables ─────────────────── v0.0.8
+ Installed FileIO ────────────────────── v1.0.7
+ Installed GR ────────────────────────── v0.40.0
+  Building Electron ────────→ `/opt/julia/packages/Electron/wL84D/deps/build.log`
+  Building NodeJS ──────────→ `/opt/julia/packages/NodeJS/rx0mH/deps/build.log`
+  Building NLopt ───────────→ `/opt/julia/packages/NLopt/eqN9a/deps/build.log`
+  Building FFTW ────────────→ `/opt/julia/packages/FFTW/2okGQ/deps/build.log`
+  Building VegaLite ────────→ `/opt/julia/packages/VegaLite/sHyyT/deps/build.log`
+  Building StringEncodings ─→ `/opt/julia/packages/StringEncodings/ICuGB/deps/build.log`
+[91m┌ Error: Error building `VegaLite`: 
+│ 
+│ > canvas@2.5.0 install /opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas
+│ > node-pre-gyp install --fallback-to-build
+│ 
+│ node-pre-gyp WARN Using needle for node-pre-gyp https download 
+│ node-pre-gyp WARN Pre-built binaries not installable for canvas@2.5.0 and node@10.15.0 (node-v64 ABI, glibc) (falling back to source compile with node-gyp) 
+│ node-pre-gyp WARN Hit error EACCES: permission denied, mkdir '/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/build' 
+│ gyp WARN EACCES user "undefined" does not have permission to access the dev dir "/home/jovyan/.node-gyp/10.15.0"
+│ gyp WARN EACCES attempting to reinstall using temporary dev dir "/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/.node-gyp"
+│ gyp WARN install got an error, rolling back install
+│ gyp WARN install got an error, rolling back install
+│ gyp ERR! configure error 
+│ gyp ERR! stack Error: EACCES: permission denied, mkdir '/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/.node-gyp'
+│ gyp ERR! System Linux 4.4.181-1.el7.elrepo.x86_64
+│ gyp ERR! command "/opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/bin/node" "/opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js" "configure" "--fallback-to-build" "--module=/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/build/Release/canvas.node" "--module_name=canvas" "--module_path=/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/build/Release" "--napi_version=3" "--node_abi_napi=napi" "--napi_build_version=0" "--node_napi_label=node-v64"
+│ gyp ERR! cwd /opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas
+│ gyp ERR! node -v v10.15.0
+│ gyp ERR! node-gyp -v v3.8.0
+│ gyp ERR! not ok 
+│ node-pre-gyp ERR! build error 
+│ node-pre-gyp ERR! stack Error: Failed to execute '/opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/bin/node /opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js configure --fallback-to-build --module=/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/build/Release/canvas.node --module_name=canvas --module_path=/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/build/Release --napi_version=3 --node_abi_napi=napi --napi_build_version=0 --node_napi_label=node-v64' (1)
+│ node-pre-gyp ERR! stack     at ChildProcess.<anonymous> (/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/node-pre-gyp/lib/util/compile.js:83:29)
+│ node-pre-gyp ERR! stack     at ChildProcess.emit (events.js:182:13)
+│ node-pre-gyp ERR! stack     at maybeClose (internal/child_process.js:962:16)
+│ node-pre-gyp ERR! stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:251:5)
+│ node-pre-gyp ERR! System Linux 4.4.181-1.el7.elrepo.x86_64
+│ node-pre-gyp ERR! command "/opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/bin/node" "/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/.bin/node-pre-gyp" "install" "--fallback-to-build"
+│ node-pre-gyp ERR! cwd /opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas
+│ node-pre-gyp ERR! node -v v10.15.0
+│ node-pre-gyp ERR! node-pre-gyp -v v0.11.0
+│ node-pre-gyp ERR! not ok 
+│ Failed to execute '/opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/bin/node /opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js configure --fallback-to-build --module=/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/build/Release/canvas.node --module_name=canvas --module_path=/opt/julia/packages/VegaLite/sHyyT/deps/node_modules/canvas/build/Release --napi_version=3 --node_abi_napi=napi --napi_build_version=0 --node_napi_label=node-v64' (1)
+│ npm ERR! code ELIFECYCLE
+│ npm ERR! errno 1
+│ npm ERR! canvas@2.5.0 install: `node-pre-gyp install --fallback-to-build`
+│ npm ERR! Exit status 1
+│ npm ERR! 
+│ npm ERR! Failed at the canvas@2.5.0 install script.
+│ npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+│ 
+│ npm ERR! A complete log of this run can be found in:
+│ npm ERR!     /home/jovyan/.npm/_logs/2019-09-16T19_35_02_098Z-debug.log
+│ ERROR: LoadError: failed process: Process(setenv(`/opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/bin/node /opt/julia/packages/NodeJS/rx0mH/deps/bin/node-v10.15.0-linux-x64/lib/node_modules/npm/bin/npm-cli.js install --scripts-prepend-node-path=true --production --no-package-lock --no-optional`; dir="/opt/julia/packages/VegaLite/sHyyT/deps"), ProcessExited(1)) [1]
+│ 
+│ Stacktrace:
+│  [1] pipeline_error at ./process.jl:813 [inlined]
+│  [2] #run#536(::Bool, ::typeof(run), ::Cmd) at ./process.jl:728
+│  [3] run(::Cmd) at ./process.jl:726
+│  [4] top-level scope at /opt/julia/packages/VegaLite/sHyyT/deps/build.jl:4
+│  [5] include at ./boot.jl:328 [inlined]
+│  [6] include_relative(::Module, ::String) at ./loading.jl:1094
+│  [7] include(::Module, ::String) at ./Base.jl:31
+│  [8] include(::String) at ./client.jl:431
+│  [9] top-level scope at none:5
+│ in expression starting at /opt/julia/packages/VegaLite/sHyyT/deps/build.jl:4
+└ @ Pkg.Operations /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/backwards_compatible_isolation.jl:647
+[0m  Building ReadStat ────────→ `/opt/julia/packages/ReadStat/JnXAZ/deps/build.log`
+  Building Snappy ──────────→ `/opt/julia/packages/Snappy/O2CHr/deps/build.log`
+  Building CodecZlib ───────→ `/opt/julia/packages/CodecZlib/9jDi1/deps/build.log`
+  Building SpecialFunctions → `/opt/julia/packages/SpecialFunctions/fvheQ/deps/build.log`
+  Building Rmath ───────────→ `/opt/julia/packages/Rmath/Py9gH/deps/build.log`
+  Building EzXML ───────────→ `/opt/julia/packages/EzXML/G0JeY/deps/build.log`
+  Building TimeZones ───────→ `/opt/julia/packages/TimeZones/UXytc/deps/build.log`
+  Building FFMPEG ──────────→ `/opt/julia/packages/FFMPEG/9JQpZ/deps/build.log`
+  Building Ipopt ───────────→ `/opt/julia/packages/Ipopt/UXSdI/deps/build.log`
+  Building Arpack ──────────→ `/opt/julia/packages/Arpack/cu5By/deps/build.log`
+  Building GR ──────────────→ `/opt/julia/packages/GR/TMylY/deps/build.log`
+  Building Plots ───────────→ `/opt/julia/packages/Plots/h3o4c/deps/build.log`
+  Building PyCall ──────────→ `/opt/julia/packages/PyCall/ttONZ/deps/build.log`
+  Building ZipFile ─────────→ `/opt/julia/packages/ZipFile/oD4uG/deps/build.log`
+  Building Thrift ──────────→ `/opt/julia/packages/Thrift/hqiAN/deps/build.log`
+  Building Dierckx ─────────→ `/opt/julia/packages/Dierckx/9SY4A/deps/build.log`
+Precompiling project...
+Precompiling ForwardDiff
+Precompiling DataVoyager
+Precompiling RegressionTables
+Precompiling Zygote
+Precompiling Expectations
+Precompiling LeastSquaresOptim
+Precompiling SparseDiffTools
+Precompiling GR
+Precompiling Krylov
+Precompiling Queryverse
+Precompiling IterativeSolvers
+Precompiling KernelDensity
+Precompiling ProgressMeter
+Precompiling Revise
+Precompiling BenchmarkTools
+Precompiling StatsPlots
+Precompiling ExponentialUtilities
+Precompiling DataFramesMeta
+Precompiling Dierckx
+Precompiling Flux
+Precompiling BlackBoxOptim
+Precompiling LinearMaps
+Precompiling JuMP
+Precompiling Roots
+Precompiling Ipopt
+Precompiling NLopt
+Precompiling LaTeXStrings
+Precompiling PkgTemplates
+Precompiling RDatasets
+Precompiling NLsolve
+Precompiling QuantEcon
+[1mInfo[0m Project name is quantecon-notebooks-julia, version is 0.3.0
+ Resolving package versions...
+ Installed DiffEqJump ────────────── v6.1.1
+ Installed DiffEqCallbacks ───────── v2.5.2
+ Installed PDMats ────────────────── v0.9.10
+ Installed FixedPolynomials ──────── v0.4.0
+ Installed DiffEqBase ────────────── v5.20.1
+ Installed DifferentialEquations ─── v5.3.1
+ Installed DiffEqOperators ───────── v4.1.0
+ Installed StochasticDiffEq ──────── v6.8.0
+ Installed MultiScaleArrays ──────── v1.4.0
+ Installed StaticPolynomials ─────── v1.3.2
+ Installed MultivariatePolynomials ─ v0.3.2
+ Installed DoubleFloats ──────────── v0.9.9
+ Installed LsqFit ────────────────── v0.8.1
+ Installed ChunkedArrays ─────────── v0.1.1
+ Installed RandomNumbers ─────────── v1.3.0
+ Installed DiffEqBiological ──────── v3.9.1
+ Installed DiffEqNoiseProcess ────── v3.3.1
+ Installed BoundaryValueDiffEq ───── v2.3.0
+ Installed LearnBase ─────────────── v0.2.2
+ Installed VectorizedRoutines ────── v0.1.0
+ Installed DynamicPolynomials ────── v0.3.3
+ Installed ProjectiveVectors ─────── v0.2.2
+ Installed OptimBase ─────────────── v2.0.0
+ Installed DiffEqFinancial ───────── v2.1.0
+ Installed DiffEqParamEstim ──────── v1.8.0
+ Installed PoissonRandom ─────────── v0.4.0
+ Installed PenaltyFunctions ──────── v0.1.2
+ Installed FixedEffects ──────────── v0.2.0
+ Installed DiffEqPhysics ─────────── v3.2.0
+ Installed DiffEqDevTools ────────── v2.14.1
+ Installed DiffEqUncertainty ─────── v1.1.0
+ Installed DimensionalPlotRecipes ── v0.2.0
+ Installed MixedSubdivisions ─────── v0.3.2
+ Installed Sundials ──────────────── v3.7.0
+ Installed HomotopyContinuation ──── v1.1.1
+ Installed ResettableStacks ──────── v0.6.0
+ Installed DocStringExtensions ───── v0.8.0
+ Installed SymEngine ─────────────── v0.7.0
+ Installed TreeViews ─────────────── v0.3.0
+ Installed FunctionWrappers ──────── v1.0.0
+ Installed DiffEqPDEBase ─────────── v0.4.0
+ Installed RecursiveFactorization ── v0.1.0
+ Installed MuladdMacro ───────────── v0.2.1
+ Installed EllipsisNotation ──────── v0.4.0
+ Installed ElasticArrays ─────────── v0.4.0
+ Installed DiffEqMonteCarlo ──────── v0.15.1
+ Installed ParameterizedFunctions ── v4.2.1
+ Installed DelayDiffEq ───────────── v5.14.0
+ Installed DiffEqSensitivity ─────── v3.3.2
+ Installed SteadyStateDiffEq ─────── v1.5.0
+ Installed PrettyTables ──────────── v0.5.1
+ Installed OrdinaryDiffEq ────────── v5.14.0
+  Updating `~/Project.toml`
+  [2b5f629d] + DiffEqBase v5.20.1
+  [459566f4] + DiffEqCallbacks v2.5.2
+  [c894b116] + DiffEqJump v6.1.1
+  [9fdde737] + DiffEqOperators v4.1.0
+  [0c46a032] + DifferentialEquations v5.3.1
+  [82899510] + IteratorInterfaceExtensions v1.0.0
+  [6fe1bfb0] + OffsetArrays v0.11.1
+  [789caeaf] + StochasticDiffEq v6.8.0
+  Updating `~/Manifest.toml`
+  [764a87c0] + BoundaryValueDiffEq v2.3.0
+  [8bab3169] + ChunkedArrays v0.1.1
+  [bcd4f6db] + DelayDiffEq v5.14.0
+  [2b5f629d] + DiffEqBase v5.20.1
+  [eb300fae] + DiffEqBiological v3.9.1
+  [459566f4] + DiffEqCallbacks v2.5.2
+  [f3b72e0c] + DiffEqDevTools v2.14.1
+  [5a0ffddc] + DiffEqFinancial v2.1.0
+  [c894b116] + DiffEqJump v6.1.1
+  [78ddff82] + DiffEqMonteCarlo v0.15.1
+  [77a26b50] + DiffEqNoiseProcess v3.3.1
+  [9fdde737] + DiffEqOperators v4.1.0
+  [34035eb4] + DiffEqPDEBase v0.4.0
+  [1130ab10] + DiffEqParamEstim v1.8.0
+  [055956cb] + DiffEqPhysics v3.2.0
+  [41bf760c] + DiffEqSensitivity v3.3.2
+  [ef61062a] + DiffEqUncertainty v1.1.0
+  [0c46a032] + DifferentialEquations v5.3.1
+  [c619ae07] + DimensionalPlotRecipes v0.2.0
+  [ffbed154] + DocStringExtensions v0.8.0
+  [497a8b3b] ↑ DoubleFloats v0.9.8 ⇒ v0.9.9
+  [7c1d4256] + DynamicPolynomials v0.3.3
+  [fdbdab4c] + ElasticArrays v0.4.0
+  [da5c29d0] + EllipsisNotation v0.4.0
+  [c8885935] ↑ FixedEffects v0.1.2 ⇒ v0.2.0
+  [3dd14ad9] + FixedPolynomials v0.4.0
+  [069b7b12] + FunctionWrappers v1.0.0
+  [f213a82b] + HomotopyContinuation v1.1.1
+  [7f8f8fb0] + LearnBase v0.2.2
+  [2fda8390] + LsqFit v0.8.1
+  [291d046c] + MixedSubdivisions v0.3.2
+  [46d2c3a1] + MuladdMacro v0.2.1
+  [f9640e96] + MultiScaleArrays v1.4.0
+  [102ac46a] + MultivariatePolynomials v0.3.2
+  [87e2bd06] + OptimBase v2.0.0
+  [1dea7af3] + OrdinaryDiffEq v5.14.0
+  [90014a1f] ↑ PDMats v0.9.9 ⇒ v0.9.10
+  [65888b18] + ParameterizedFunctions v4.2.1
+  [06bb1623] + PenaltyFunctions v0.1.2
+  [e409e4f3] + PoissonRandom v0.4.0
+  [08abe8d2] + PrettyTables v0.5.1
+  [01f381cc] + ProjectiveVectors v0.2.2
+  [e6cf234a] + RandomNumbers v1.3.0
+  [f2c3362d] + RecursiveFactorization v0.1.0
+  [ae5879a3] + ResettableStacks v0.6.0
+  [62e018b1] + StaticPolynomials v1.3.2
+  [9672c7b4] + SteadyStateDiffEq v1.5.0
+  [789caeaf] + StochasticDiffEq v6.8.0
+  [c3572dad] + Sundials v3.7.0
+  [123dc426] + SymEngine v0.7.0
+  [a2a6695c] + TreeViews v0.3.0
+  [0e69188a] + VectorizedRoutines v0.1.0
+  Building Sundials ─→ `/opt/julia/packages/Sundials/CRi5j/deps/build.log`
+  Building SymEngine → `/opt/julia/packages/SymEngine/zSUGO/deps/build.log`
+Activating environment at `/opt/julia/environments/v1.2/Project.toml`
+ Resolving package versions...
+ Installed SparseDiffTools ─────── v0.9.0
+ Installed DiffEqJump ──────────── v6.2.1
+ Installed LeastSquaresOptim ───── v0.7.4
+ Installed Expectations ────────── v1.1.1
+ Installed CategoricalArrays ───── v0.6.0
+ Installed DataFrames ──────────── v0.19.4
+ Installed FixedEffectModels ───── v0.7.4
+ Installed StochasticDiffEq ────── v6.11.0
+ Installed StatsModels ─────────── v0.5.0
+ Installed Revise ──────────────── v2.1.10
+ Installed FastGaussQuadrature ─── v0.4.0
+ Installed BenchmarkTools ──────── v0.4.3
+ Installed Distributions ───────── v0.21.1
+ Installed StatsBase ───────────── v0.32.0
+ Installed Optim ───────────────── v0.19.3
+ Installed Flux ────────────────── v0.9.0
+ Installed GR ──────────────────── v0.41.0
+ Installed QuadGK ──────────────── v2.0.3
+ Installed DiffEqCallbacks ─────── v2.8.0
+ Installed Parameters ──────────── v0.12.0
+ Installed DiffEqBase ──────────── v6.2.2
+ Installed GLM ─────────────────── v1.1.1
+ Installed DifferentialEquations ─ v6.8.0
+ Installed NLsolve ─────────────── v4.1.0
+ Installed Query ───────────────── v0.12.2
+ Installed GPUArrays ───────────── v1.0.2
+ Installed MultiScaleArrays ────── v1.5.0
+ Installed Roots ───────────────── v0.8.3
+ Installed Calculus ────────────── v0.5.0
+ Installed LLVM ────────────────── v1.3.0
+ Installed JuliaInterpreter ────── v0.7.2
+ Installed DiffEqFinancial ─────── v2.2.1
+ Installed CEnum ───────────────── v0.2.0
+ Installed DataStructures ──────── v0.17.0
+ Installed RecursiveArrayTools ─── v1.0.2
+ Installed DiffEqDiffTools ─────── v1.3.0
+ Installed CUDAnative ──────────── v2.3.1
+ Installed CUDAdrv ─────────────── v3.1.0
+ Installed CuArrays ────────────── v1.2.1
+ Installed CUDAapi ─────────────── v1.1.0
+ Installed DelayDiffEq ─────────── v5.16.0
+ Installed OrdinaryDiffEq ──────── v5.17.0
+  Updating `/opt/julia/environments/v1.2/Project.toml`
+  [aae01518] + BandedMatrices v0.10.1
+  [6e4b80f9] + BenchmarkTools v0.4.3
+  [a134a8b2] + BlackBoxOptim v0.5.0
+  [324d7699] + CategoricalArrays v0.6.0
+  [34da2185] + Compat v2.1.0
+  [a93c6f00] + DataFrames v0.19.4
+  [1313f7d8] + DataFramesMeta v0.5.0
+  [5721bf48] + DataVoyager v0.3.1
+  [39dd38d3] + Dierckx v0.4.1
+  [2b5f629d] + DiffEqBase v6.2.2
+  [459566f4] + DiffEqCallbacks v2.8.0
+  [c894b116] + DiffEqJump v6.2.1
+  [9fdde737] + DiffEqOperators v4.1.0
+  [0c46a032] + DifferentialEquations v6.8.0
+  [31c24e10] + Distributions v0.21.1
+  [2fe49d83] + Expectations v1.1.1
+  [d4d017d3] + ExponentialUtilities v1.5.1
+  [442a2c76] + FastGaussQuadrature v0.4.0
+  [1a297f60] + FillArrays v0.6.4
+  [9d5cd8c9] + FixedEffectModels v0.7.4
+  [587475ba] + Flux v0.9.0
+  [f6369f11] + ForwardDiff v0.10.3
+  [38e38edf] + GLM v1.1.1
+  [28b8d3ca] + GR v0.41.0
+  [a98d9a8b] + Interpolations v0.12.2
+  [b6b21f68] + Ipopt v0.6.0
+  [42fd0dbc] + IterativeSolvers v0.8.1
+  [82899510] + IteratorInterfaceExtensions v1.0.0
+  [4076af6c] + JuMP v0.20.0
+  [5ab0869b] + KernelDensity v0.5.1
+  [ba0b0d4f] + Krylov v0.3.0
+  [b964fa9f] + LaTeXStrings v1.0.3
+  [0fc2ff8b] + LeastSquaresOptim v0.7.4
+  [7a12625a] + LinearMaps v2.5.1
+  [76087f3c] + NLopt v0.5.1
+  [2774e3e8] + NLsolve v4.1.0
+  [6fe1bfb0] + OffsetArrays v0.11.1
+  [429524aa] + Optim v0.19.3
+  [d96e819e] + Parameters v0.12.0
+  [14b8a8f1] + PkgTemplates v0.6.2
+  [91a5bcdd] + Plots v0.26.3
+  [f27b6e38] + Polynomials v0.5.2
+  [92933f4c] + ProgressMeter v1.0.0
+  [1fd47b50] + QuadGK v2.0.3
+  [fcd29c91] + QuantEcon v0.16.2
+  [1a8c2f83] + Query v0.12.2
+  [612083be] + Queryverse v0.3.1
+  [ce6b1742] + RDatasets v0.6.3
+  [d519eb52] + RegressionTables v0.2.2
+  [295af30f] + Revise v2.1.10
+  [f2b01f46] + Roots v0.8.3
+  [47a9eef4] + SparseDiffTools v0.9.0
+  [90137ffa] + StaticArrays v0.11.0
+  [2913bbd2] + StatsBase v0.32.0
+  [3eaba693] + StatsModels v0.5.0
+  [f3b207a7] + StatsPlots v0.12.0
+  [789caeaf] + StochasticDiffEq v6.11.0
+  [112f6efa] + VegaLite v0.7.0
+  [e88e6eb3] + Zygote v0.3.4
+  [37e2e46d] + LinearAlgebra 
+  [9a3f8284] + Random 
+  [2f01184e] + SparseArrays 
+  [10745b16] + Statistics 
+  [8dfed614] + Test 
+  Updating `/opt/julia/environments/v1.2/Manifest.toml`
+  [621f4979] + AbstractFFTs v0.4.1
+  [1520ce14] + AbstractTrees v0.2.1
+  [79e6a3ab] + Adapt v1.0.0
+  [ec485272] + ArnoldiMethod v0.0.4
+  [7d9fca2a] + Arpack v0.3.1
+  [4fba245c] + ArrayInterface v1.2.1
+  [69666777] + Arrow v0.2.3
+  [13072b0f] + AxisAlgorithms v1.0.0
+  [aae01518] + BandedMatrices v0.10.1
+  [6e4b80f9] + BenchmarkTools v0.4.3
+  [a134a8b2] + BlackBoxOptim v0.5.0
+  [8e7c35d0] + BlockArrays v0.9.1
+  [ffab5731] + BlockBandedMatrices v0.4.6
+  [764a87c0] + BoundaryValueDiffEq v2.3.0
+  [fa961155] + CEnum v0.2.0
+  [a9c8d775] + CPUTime v1.0.0
+  [00ebfdb7] + CSTParser v0.6.2
+  [336ed68f] + CSV v0.5.12
+  [5d742f6a] + CSVFiles v0.16.0
+  [3895d2a7] + CUDAapi v1.1.0
+  [c5f51814] + CUDAdrv v3.1.0
+  [be33ccc6] + CUDAnative v2.3.1
+  [49dc2e85] + Calculus v0.5.0
+  [324d7699] + CategoricalArrays v0.6.0
+  [aaaa29a8] + Clustering v0.13.3
+  [da1fd8a2] + CodeTracking v0.5.8
+  [944b1d66] + CodecZlib v0.5.2
+  [3da002f7] + ColorTypes v0.8.0
+  [5ae59095] + Colors v0.9.6
+  [861a8166] + Combinatorics v0.7.0
+  [bbf7d656] + CommonSubexpressions v0.2.0
+  [d38c429a] + Contour v0.5.1
+  [a8cc5b0e] + Crayons v4.0.0
+  [3a865a2d] + CuArrays v1.2.1
+  [717857b8] + DSP v0.6.0
+  [9a962f9c] + DataAPI v1.0.1
+  [a93c6f00] + DataFrames v0.19.4
+  [1313f7d8] + DataFramesMeta v0.5.0
+  [864edb3b] + DataStructures v0.17.0
+  [e2d170a0] + DataValueInterfaces v1.0.0
+  [e7dc6d0d] + DataValues v0.4.12
+  [5721bf48] + DataVoyager v0.3.1
+  [bcd4f6db] + DelayDiffEq v5.16.0
+  [39dd38d3] + Dierckx v0.4.1
+  [2b5f629d] + DiffEqBase v6.2.2
+  [459566f4] + DiffEqCallbacks v2.8.0
+  [01453d9d] + DiffEqDiffTools v1.3.0
+  [5a0ffddc] + DiffEqFinancial v2.2.1
+  [c894b116] + DiffEqJump v6.2.1
+  [77a26b50] + DiffEqNoiseProcess v3.3.1
+  [9fdde737] + DiffEqOperators v4.1.0
+  [055956cb] + DiffEqPhysics v3.2.0
+  [163ba53b] + DiffResults v0.0.4
+  [b552c78f] + DiffRules v0.0.10
+  [0c46a032] + DifferentialEquations v6.8.0
+  [c619ae07] + DimensionalPlotRecipes v0.2.0
+  [b4f34e82] + Distances v0.8.2
+  [31c24e10] + Distributions v0.21.1
+  [ffbed154] + DocStringExtensions v0.8.0
+  [497a8b3b] + DoubleFloats v0.9.9
+  [a1bb12fb] + Electron v1.0.0
+  [89b67f3b] + ExcelFiles v1.0.0
+  [c04bee98] + ExcelReaders v0.11.0
+  [2fe49d83] + Expectations v1.1.1
+  [d4d017d3] + ExponentialUtilities v1.5.1
+  [8f5d6c58] + EzXML v0.9.4
+  [c87230d0] + FFMPEG v0.2.2
+  [7a1cc6ca] + FFTW v0.3.0
+  [9aa1b823] + FastClosures v0.3.1
+  [442a2c76] + FastGaussQuadrature v0.4.0
+  [b675d258] + FeatherFiles v0.8.1
+  [409f5150] + FeatherLib v0.2.0
+  [5789e2e9] + FileIO v1.0.7
+  [8fc22ac5] + FilePaths v0.8.0
+  [48062228] + FilePathsBase v0.6.2
+  [1a297f60] + FillArrays v0.6.4
+  [9d5cd8c9] + FixedEffectModels v0.7.4
+  [c8885935] + FixedEffects v0.2.0
+  [53c48c17] + FixedPointNumbers v0.6.1
+  [53afe959] + FlatBuffers v0.5.3
+  [587475ba] + Flux v0.9.0
+  [59287772] + Formatting v0.4.0
+  [f6369f11] + ForwardDiff v0.10.3
+  [069b7b12] + FunctionWrappers v1.0.0
+  [38e38edf] + GLM v1.1.1
+  [0c68f7d7] + GPUArrays v1.0.2
+  [28b8d3ca] + GR v0.41.0
+  [01680d73] + GenericSVD v0.2.1
+  [c145ed77] + GenericSchur v0.2.3
+  [4d00f742] + GeometryTypes v0.7.6
+  [7869d1d1] + IRTools v0.2.3
+  [d25df0c9] + Inflate v0.1.1
+  [a98d9a8b] + Interpolations v0.12.2
+  [41ab1584] + InvertedIndices v1.0.0
+  [b6b21f68] + Ipopt v0.6.0
+  [c8e1da08] + IterTools v1.2.0
+  [1c8ee90f] + IterableTables v0.11.0
+  [42fd0dbc] + IterativeSolvers v0.8.1
+  [82899510] + IteratorInterfaceExtensions v1.0.0
+  [682c06a0] ↓ JSON v0.21.0 ⇒ v0.20.0
+  [7d188eb4] + JSONSchema v0.1.1
+  [4076af6c] + JuMP v0.20.0
+  [aa1ae85d] + JuliaInterpreter v0.7.2
+  [e5e0dc1b] + Juno v0.7.2
+  [5ab0869b] + KernelDensity v0.5.1
+  [ba0b0d4f] + Krylov v0.3.0
+  [929cbde3] + LLVM v1.3.0
+  [b964fa9f] + LaTeXStrings v1.0.3
+  [5078a376] + LazyArrays v0.10.0
+  [0fc2ff8b] + LeastSquaresOptim v0.7.4
+  [093fc24a] + LightGraphs v1.3.0
+  [d3d80556] + LineSearches v7.0.1
+  [7a12625a] + LinearMaps v2.5.1
+  [5c8ed15e] + LinearOperators v0.5.4
+  [6f1432cf] + LoweredCodeUtils v0.3.8
+  [1914dd2f] + MacroTools v0.5.1
+  [b8f27783] + MathOptInterface v0.9.2
+  [fdba3010] + MathProgBase v0.7.7
+  [a3b82374] + MatrixFactorizations v0.1.0
+  [442fdcdd] + Measures v0.3.0
+  [e89f7d12] + Media v0.5.0
+  [f9f48841] + MemPool v0.2.0
+  [e1d29d7a] + Missings v0.4.2
+  [78c3b35d] + Mocking v0.7.0
+  [46d2c3a1] + MuladdMacro v0.2.1
+  [f9640e96] + MultiScaleArrays v1.5.0
+  [ffc61752] + Mustache v0.5.13
+  [d41bc354] + NLSolversBase v7.4.1
+  [76087f3c] + NLopt v0.5.1
+  [2774e3e8] + NLsolve v4.1.0
+  [872c559c] + NNlib v0.6.0
+  [77ba4419] + NaNMath v0.3.2
+  [b8a86587] + NearestNeighbors v0.4.3
+  [2bd173c7] + NodeJS v0.6.0
+  [4d1e1d77] + Nullables v0.0.8
+  [510215fc] + Observables v0.2.3
+  [6fe1bfb0] + OffsetArrays v0.11.1
+  [429524aa] + Optim v0.19.3
+  [1dea7af3] + OrdinaryDiffEq v5.17.0
+  [90014a1f] + PDMats v0.9.10
+  [d96e819e] ↑ Parameters v0.11.0 ⇒ v0.12.0
+  [626c502c] + Parquet v0.3.0
+  [46a55296] + ParquetFiles v0.2.0
+  [14b8a8f1] + PkgTemplates v0.6.2
+  [ccf2f8ad] + PlotThemes v0.3.0
+  [995b91a9] + PlotUtils v0.5.8
+  [91a5bcdd] + Plots v0.26.3
+  [e409e4f3] + PoissonRandom v0.4.0
+  [f27b6e38] + Polynomials v0.5.2
+  [2dfb63ee] + PooledArrays v0.5.2
+  [85a6dd25] + PositiveFactorizations v0.2.2
+  [27ebfcd6] + Primes v0.4.0
+  [92933f4c] + ProgressMeter v1.0.0
+  [3349acd9] + ProtoBuf v0.7.0
+  [438e738f] + PyCall v1.91.2
+  [1fd47b50] + QuadGK v2.0.3
+  [be4d8f0f] + Quadmath v0.5.0
+  [fcd29c91] + QuantEcon v0.16.2
+  [1a8c2f83] + Query v0.12.2
+  [2aef5ad7] + QueryOperators v0.9.1
+  [30ad73d7] + QueryTables v0.1.0
+  [612083be] + Queryverse v0.3.1
+  [df47a6cb] + RData v0.6.2
+  [ce6b1742] + RDatasets v0.6.3
+  [e6cf234a] + RandomNumbers v1.3.0
+  [c84ed2f1] + Ratios v0.3.1
+  [d71aba96] + ReadStat v0.4.1
+  [3cdcf5f2] + RecipesBase v0.7.0
+  [731186ca] + RecursiveArrayTools v1.0.2
+  [f2c3362d] + RecursiveFactorization v0.1.0
+  [189a3867] + Reexport v0.2.0
+  [d519eb52] + RegressionTables v0.2.2
+  [ae029012] + Requires v0.5.2
+  [ae5879a3] + ResettableStacks v0.6.0
+  [295af30f] + Revise v2.1.10
+  [79098fc4] + Rmath v0.5.0
+  [f2b01f46] + Roots v0.8.3
+  [992d4aef] + Showoff v0.3.1
+  [699a6c99] + SimpleTraits v0.9.0
+  [59d4ed8c] + Snappy v0.3.0
+  [a2af1166] + SortingAlgorithms v0.3.1
+  [47a9eef4] + SparseDiffTools v0.9.0
+  [d4ead438] + SpatialIndexing v0.1.2
+  [276daf66] + SpecialFunctions v0.7.2
+  [1463e38c] + StatFiles v0.8.0
+  [90137ffa] + StaticArrays v0.11.0
+  [2913bbd2] + StatsBase v0.32.0
+  [4c63d2b9] + StatsFuns v0.8.0
+  [3eaba693] + StatsModels v0.5.0
+  [f3b207a7] + StatsPlots v0.12.0
+  [9672c7b4] + SteadyStateDiffEq v1.5.0
+  [789caeaf] + StochasticDiffEq v6.11.0
+  [69024149] + StringEncodings v0.3.1
+  [c3572dad] + Sundials v3.7.0
+  [5e66a065] + TableShowUtils v0.2.5
+  [3783bdb8] + TableTraits v1.0.0
+  [382cd787] + TableTraitsUtils v1.0.0
+  [bd369af6] + Tables v0.2.11
+  [e0df1984] + TextParse v0.9.1
+  [8d9c9c80] + Thrift v0.6.0
+  [f269a46b] + TimeZones v0.10.0
+  [a759f4b9] + TimerOutputs v0.5.0
+  [0796e94c] + Tokenize v0.5.6
+  [9f7883ad] + Tracker v0.2.3
+  [3bb67fe8] + TranscodingStreams v0.9.5
+  [a2a6695c] + TreeViews v0.3.0
+  [112f6efa] + VegaLite v0.7.0
+  [19fa3120] + VertexSafeGraphs v0.1.0
+  [ea10d353] + WeakRefStrings v0.6.1
+  [cc8bc4a8] + Widgets v0.6.2
+  [efce3f68] + WoodburyMatrices v0.4.1
+  [fdbf4ff8] + XLSX v0.5.5
+  [a5390f91] + ZipFile v0.8.3
+  [e88e6eb3] + Zygote v0.3.4
+  [700de1a5] + ZygoteRules v0.1.0
+  [9fa8497b] + Future 
+  [9abbd945] + Profile 
+  [4607b0f0] + SuiteSparse 
+  Building GR → `/opt/julia/packages/GR/ZI5OE/deps/build.log`
+Activating environment at `~/Project.toml`
+Removing intermediate container f076db851b12
+ ---> b29fc56ff078
+Step 23/44 : RUN julia -e "using Pkg; pkg\"add GR Plots StatsPlots DataFrames StatsPlots CSV PlotUtils GeometryTypes Tables PackageCompiler#sd-notomls CategoricalArrays IteratorInterfaceExtensions PooledArrays WeakRefStrings\""
+ ---> Running in b3a5607de381
+  Updating registry at `/opt/julia/registries/General`
+  Updating git-repo `https://github.com/JuliaRegistries/General.git`
+[?25l[2K[?25h   Cloning git-repo `https://github.com/JuliaLang/PackageCompiler.jl.git`
+[?25l    Fetching: [>                                        ]  0.0 %[2K[?25h  Updating git-repo `https://github.com/JuliaLang/PackageCompiler.jl.git`
+[?25l    Fetching: [>                                        ]  0.0 %[2K[?25h Resolving package versions...
+ Installed HTTPClient ────── v0.2.1
+ Installed WinRPM ────────── v0.4.2
+ Installed Libz ──────────── v1.0.0
+ Installed TextWrap ──────── v0.3.0
+ Installed LibCURL ───────── v0.5.2
+ Installed LibExpat ──────── v0.5.0
+ Installed BufferedStreams ─ v1.0.0
+ Installed ArgParse ──────── v0.6.2
+  Updating `/opt/julia/environments/v1.2/Project.toml`
+  [336ed68f] + CSV v0.5.12
+  [4d00f742] + GeometryTypes v0.7.6
+  [9b87118b] + PackageCompiler v0.6.4+ #sd-notomls (https://github.com/JuliaLang/PackageCompiler.jl.git)
+  [995b91a9] + PlotUtils v0.5.8
+  [2dfb63ee] + PooledArrays v0.5.2
+  [bd369af6] + Tables v0.2.11
+  [ea10d353] + WeakRefStrings v0.6.1
+  Updating `/opt/julia/environments/v1.2/Manifest.toml`
+  [c7e460c6] + ArgParse v0.6.2
+  [e1450e63] + BufferedStreams v1.0.0
+  [0862f596] + HTTPClient v0.2.1
+  [b27032c2] + LibCURL v0.5.2
+  [522f3ed2] + LibExpat v0.5.0
+  [2ec943e9] + Libz v1.0.0
+  [9b87118b] + PackageCompiler v0.6.4+ #sd-notomls (https://github.com/JuliaLang/PackageCompiler.jl.git)
+  [b718987f] + TextWrap v0.3.0
+  [c17dfb99] + WinRPM v0.4.2
+  Building LibCURL ────────→ `/opt/julia/packages/LibCURL/lWJxD/deps/build.log`
+  Building WinRPM ─────────→ `/opt/julia/packages/WinRPM/Y9QdZ/deps/build.log`
+  Building PackageCompiler → `/opt/julia/packages/PackageCompiler/bANkt/deps/build.log`
+Removing intermediate container b3a5607de381
+ ---> 5decb7c3cd60
+Step 24/44 : RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests\""
+ ---> Running in 010fd3acca18
+  Updating registry at `/opt/julia/registries/General`
+  Updating git-repo `https://github.com/JuliaRegistries/General.git`
+[?25l[2K[?25h Resolving package versions...
+ Installed CatIndices ──────────────── v0.2.0
+ Installed DualNumbers ─────────────── v0.6.2
+ Installed MappedArrays ────────────── v0.2.1
+ Installed ComputationalResources ──── v0.3.0
+ Installed Images ──────────────────── v0.18.0
+ Installed Unitful ─────────────────── v0.17.0
+ Installed UnicodePlots ────────────── v1.1.0
+ Installed VisualRegressionTests ───── v0.3.1
+ Installed Graphics ────────────────── v0.4.0
+ Installed RangeArrays ─────────────── v0.3.1
+ Installed ImageTransformations ────── v0.8.0
+ Installed ImageAxes ───────────────── v0.6.1
+ Installed IdentityRanges ──────────── v0.3.0
+ Installed ImageMorphology ─────────── v0.2.4
+ Installed IntervalSets ────────────── v0.3.2
+ Installed ImageCore ───────────────── v0.8.5
+ Installed ImageShow ───────────────── v0.2.0
+ Installed QuartzImageIO ───────────── v0.6.0
+ Installed IndirectArrays ──────────── v0.5.0
+ Installed ImageDistances ──────────── v0.2.4
+ Installed Rotations ───────────────── v0.12.0
+ Installed ImageMagick ─────────────── v0.7.5
+ Installed CoordinateTransformations ─ v0.5.0
+ Installed ColorVectorSpace ────────── v0.7.1
+ Installed ImageMetadata ───────────── v0.7.2
+ Installed PaddedViews ─────────────── v0.4.2
+ Installed CustomUnitRanges ────────── v0.2.0
+ Installed TiledIteration ──────────── v0.2.3
+ Installed FFTViews ────────────────── v0.3.0
+ Installed ImageFiltering ──────────── v0.6.5
+ Installed AxisArrays ──────────────── v0.3.3
+  Updating `/opt/julia/environments/v1.2/Project.toml`
+  [e7dc6d0d] + DataValues v0.4.12
+  [fa6b7ba4] + DualNumbers v0.6.2
+  [916415d5] + Images v0.18.0
+  [b8865327] + UnicodePlots v1.1.0
+  [1986cc42] + Unitful v0.17.0
+  [34922c18] + VisualRegressionTests v0.3.1
+  Updating `/opt/julia/environments/v1.2/Manifest.toml`
+  [39de3d68] + AxisArrays v0.3.3
+  [aafaddc9] + CatIndices v0.2.0
+  [c3611d14] + ColorVectorSpace v0.7.1
+  [ed09eef8] + ComputationalResources v0.3.0
+  [150eb455] + CoordinateTransformations v0.5.0
+  [dc8bdbbb] + CustomUnitRanges v0.2.0
+  [fa6b7ba4] + DualNumbers v0.6.2
+  [4f61f5a4] + FFTViews v0.3.0
+  [a2bd30eb] + Graphics v0.4.0
+  [bbac6d45] + IdentityRanges v0.3.0
+  [2803e5a7] + ImageAxes v0.6.1
+  [a09fc81d] + ImageCore v0.8.5
+  [51556ac3] + ImageDistances v0.2.4
+  [6a3955dd] + ImageFiltering v0.6.5
+  [6218d12a] + ImageMagick v0.7.5
+  [bc367c6b] + ImageMetadata v0.7.2
+  [787d08f9] + ImageMorphology v0.2.4
+  [4e3cecfd] + ImageShow v0.2.0
+  [02fcd773] + ImageTransformations v0.8.0
+  [916415d5] + Images v0.18.0
+  [9b13fd28] + IndirectArrays v0.5.0
+  [8197267c] + IntervalSets v0.3.2
+  [dbb5928d] + MappedArrays v0.2.1
+  [5432bcbf] + PaddedViews v0.4.2
+  [dca85d43] + QuartzImageIO v0.6.0
+  [b3c3ace0] + RangeArrays v0.3.1
+  [6038ab10] + Rotations v0.12.0
+  [06e1c1a7] + TiledIteration v0.2.3
+  [b8865327] + UnicodePlots v1.1.0
+  [1986cc42] + Unitful v0.17.0
+  [34922c18] + VisualRegressionTests v0.3.1
+  Building ImageMagick → `/opt/julia/packages/ImageMagick/vMfoS/deps/build.log`
+Removing intermediate container 010fd3acca18
+ ---> d0396b7a7c65
+Step 25/44 : RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, :DataFrames, :CSV, :StatsPlots, install = true); cp(syso, sysold, force = true)"
+ ---> Running in a65a621893fd
+  Updating registry at `/opt/julia/registries/General`
+  Updating git-repo `https://github.com/JuliaRegistries/General.git`
+[?25l[2K[?25h Resolving package versions...
+  Updating `/opt/julia/environments/v1.2/Project.toml`
+  [b99e7846] + BinaryProvider v0.5.6
+  [944b1d66] + CodecZlib v0.5.2
+  [864edb3b] + DataStructures v0.17.0
+  [5789e2e9] + FileIO v1.0.7
+  [6218d12a] + ImageMagick v0.7.5
+  [ade2ca70] + Dates 
+  [44cfe95a] + Pkg 
+  Updating `/opt/julia/environments/v1.2/Manifest.toml`
+ [no changes]
+[91m[ Info: downloading reference images for version 0.0.1
+[0m[91m[ Info: Testing plot: gr:1:Lines
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref1.png matches.  Difference: 0.00139729602360031
+[0m[91m[ Info: Testing plot: gr:2:Functions, adding data, and animations
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref2.png matches.  Difference: 0.0011927570038920148
+[0m[91m[ Info: Testing plot: gr:3:Parametric plots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref3.png matches.  Difference: 0.0015872159344506094
+[ Info: Testing plot: gr:4:Colors
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref4.png matches.  Difference: 0.005260198637048354
+[0m[91m[ Info: Testing plot: gr:5:Global
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref5.png matches.  Difference: 0.005034736845084589
+[0m[91m[ Info: Testing plot: gr:6:Images
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref6.png matches.  Difference: 0.0019512053026279693
+[0m[91m[ Info: Testing plot: gr:7:Arguments
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref7.png matches.  Difference: 0.0012614239724851905
+[0m[91m[ Info: Testing plot: gr:8:Build plot in pieces
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref8.png matches.  Difference: 0.0011679319936617296
+[0m[91m[ Info: Testing plot: gr:9:
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref9.png matches.  Difference: 0.001366088278159216
+[0m[91m[ Info: Testing plot: gr:10:Histogram2D
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref10.png matches.  Difference: 0.001964209998839973
+[0m[91m[ Info: Testing plot: gr:11:Line types
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref11.png matches.  Difference: 0.0033600661126396594
+[0m[91m[ Info: Testing plot: gr:12:Line styles
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref12.png matches.  Difference: 0.0037642594771708877
+[0m[91m[ Info: Testing plot: gr:13:Marker types
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref13.png matches.  Difference: 0.0069868261611694925
+[0m[91m[ Info: Testing plot: gr:14:Bar
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref14.png matches.  Difference: 0.0012299164170406882
+[0m[91m[ Info: Testing plot: gr:15:Histogram
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref15.png matches.  Difference: 0.0012788060335922865
+[0m[91m[ Info: Testing plot: gr:16:Subplots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref16.png matches.  Difference: 0.0
+[0m[91m[ Info: Testing plot: gr:17:Adding to subplots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref17.png matches.  Difference: 0.0053796243827973576
+[0m[91m[ Info: Testing plot: gr:18:
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref18.png matches.  Difference: 0.008208893022677285
+[0m[91m[ Info: Testing plot: gr:19:Open/High/Low/Close
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref19.png matches.  Difference: 0.0010991193590176916
+[0m[91m[ Info: Testing plot: gr:20:Annotations
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref20.png matches.  Difference: 0.014843101548767276
+[ Info: Testing plot: gr:21:Custom Markers
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref21.png matches.  Difference: 0.0016085063219953544
+[0m[91m[ Info: Testing plot: gr:22:Contours
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref22.png matches.  Difference: 0.003951127144072755
+[ Info: Testing plot: gr:23:Pie
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.17.2/ref23.png matches.  Difference: 0.030755941108560995
+[0m[91m[ Info: Testing plot: gr:24:3D
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref24.png matches.  Difference: 0.0016401263130674895
+[0m[91m[ Info: Testing plot: gr:26:Groups and Subplots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref26.png matches.  Difference: 0.005274520469725564
+[0m[91m[ Info: Testing plot: gr:27:Polar Plots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref27.png matches.  Difference: 0.0027817768464056614
+[0m[91m[ Info: Testing plot: gr:28:Heatmap, categorical axes, and aspect_ratio
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref28.png matches.  Difference: 0.019815565267414157
+[0m[91m[ Info: Testing plot: gr:29:Layouts, margins, label rotation, title location
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref29.png matches.  Difference: 0.0072668091491655705
+[0m[91m[ Info: Testing plot: gr:31:Animation with subplots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref31.png matches.  Difference: 0.004480312234982209
+[0m[91m[ Info: Testing plot: gr:32:Spy
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref32.png matches.  Difference: 0.014372653917299683
+[0m[91m[ Info: Testing plot: gr:33:Magic grid argument
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref33.png matches.  Difference: 0.01200926200175385
+[0m[91m[ Info: Testing plot: gr:34:Framestyle
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref34.png matches.  Difference: 0.009531077218071372
+[0m[91m[ Info: Testing plot: gr:35:Lines and markers with varying colors
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref35.png matches.  Difference: 0.0034885501154748298
+[0m[91m[ Info: Testing plot: gr:36:Portfolio Composition maps
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref36.png matches.  Difference: 0.0034041579034496928
+[0mTest Summary: | Pass  Total
+GR            |   36     36
+                      ┌──────────────────────────────────────────────────┐   
+   0.8737534070424064 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⢲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡤⠒⠉⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⢀⠴⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡰⠁⠀⠀⠀⠀⠀⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⢠⠊⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⠀⠀⡔⠁⠀⠀⠀⠈⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⢀⠎⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠀⠀⠀⠀⠀⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⡀⠀⠀⠀⠀⠀⢰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⣀⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢱⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⢀⡠⠢⢄⣀⠀⠀⢀⠇⠀⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⣀⠔⠁⠀⠀⠀⠀⠉⠒⠜⠀⠀⠀⠀⠀⠀│   
+   0.1809792182704848 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      └──────────────────────────────────────────────────┘   
+                      0.73                                           10.27                       ┌──────────────────────────────────────────────────┐   
+     1.953469330177843 │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣖⠒⠒⠒⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⣿⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⡇⡇⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⡇⢱⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀⡇⠘⡄⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀⡇⠀⢇⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⠀⠀⠀⡇⠀⢸⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠤⠤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣰⠥⠤⠤⡄⡇⠀⠀⡇⡇⠀⠀⠀⠀⣀⣀⣀⣀⡀⠀⠀⢀⠎⢸⠀⠉⠢⣇⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡏⠉⢹⠉⠉⠉⡯⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠉⠉⢹⢹⠉⠉⠉⣽⠉⠙⠫⣉⢹⢉⠝⠉⢹⠉⠉⠉⠉⠉⢫⠉⠉⠉⢹⠉⠉⠉⡏⠉⠉│   
+                       │⡇⠀⢸⠀⡠⠊⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣼⠀⢀⠎⢸⠀⠀⠀⠀⠙⠓⠒⠒⠚⠀⠀⠀⠀⠀⠈⡆⠀⠀⢸⠀⠀⠀⡇⠀⠀│   
+                       │⡇⠀⠸⠮⠤⠤⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⢀⠎⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡀⠀⢸⠀⠀⠀⡇⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠧⠤⠤⠼⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⢸⠀⠀⠀⡇⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⢸⠀⠀⠀⡇⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣼⠀⠀⠀⡇⠀⠀│   
+   -1.6041158298033489 │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⠤⠤⠤⠇⠀⠀│   
+                       └──────────────────────────────────────────────────┘   
+                       -0.005640000000000034             11.005640000000001Test Summary: | Pass  Total
+UnicodePlots  |    6      6
+Test Summary: | Pass  Total
+Axes          |    6      6
+         ┌──────────────────────────────────────────────────┐   
+    5.15 │⠀⠀⢸⢖⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⢲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+         │⠀⠀⢸⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⡀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⡀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⡀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⡀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢺⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⡄⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀│   
+   -0.15 │⠤⠤⢼⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠼⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠧⠤⠤│   
+         └──────────────────────────────────────────────────┘   
+         -0.1236                                       2.1236         ┌──────────────────────────────────────────────────┐   
+    1.03 │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   -0.03 │⠤⡧⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤│   
+         └──────────────────────────────────────────────────┘   
+         -0.03                                           1.03        ┌──────────────────────────────────────────────────┐   
+   4.09 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠄⠀│ y1
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠊⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠊⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠚⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠒⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠒⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   0.91 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        └──────────────────────────────────────────────────┘   
+        0.88                                            5.12        ┌──────────────────────────────────────────────────┐   
+   4.09 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀│ y1
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡰⠁⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   0.91 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        └──────────────────────────────────────────────────┘   
+        0.61                                           14.39        ┌──────────────────────────────────────────────────┐   
+   2.03 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y2
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   0.97 │⠀⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠄⠀│   
+        └──────────────────────────────────────────────────┘   
+        0.97                                            2.03        ┌──────────────────────────────────────────────────┐   
+   4.09 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠄⠀│ y1
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠃⠀⠀│ y2
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠃⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⢀⠎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   0.91 │⠀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        └──────────────────────────────────────────────────┘   
+        0.41000000000000003                             3.59Test Summary: |
+NoFail        | No tests
+Test Summary: | Pass  Total
+EmptyAnim     |    1      1
+Test Summary: | Pass  Total
+Segments      |    8      8
+Test Summary: | Pass  Total
+Utils         |   20     20
+Running tests:
+Test Summary: | Pass  Total
+make_unique   |    3      3
+Test Summary: | Pass  Total
+count         |    2      2
+Test Summary: | Pass  Total
+inner_outer   |    2      2
+	[1m[32mPASSED[0m: utils.jl
+Test Summary: | Pass  Total
+hcat          |   10     10
+Test Summary: | Pass  Total
+hcat: copying |   26     26
+Test Summary:            | Pass  Total
+hcat ::AbstractDataFrame |    2      2
+Test Summary:            | Pass  Total
+hcat ::AbstractDataFrame |    2      2
+Test Summary:          | Pass  Total
+hcat ::AbstractVectors |   11     11
+Test Summary:  | Pass  Total
+hcat: copycols |   76     76
+Test Summary: | Pass  Total
+vcat          |   21     21
+Test Summary: | Pass  Total
+vcat copy     |    2      2
+Test Summary: | Pass  Total
+vcat >2 args  |    4      4
+Test Summary:       | Pass  Total
+vcat mixed coltypes |   18     18
+Test Summary:     | Pass  Total
+vcat out of order |   20     20
+Test Summary:         | Pass  Total
+vcat with cols=:union |    6      6
+Test Summary:             | Pass  Total
+vcat with cols=:intersect |    6      6
+Test Summary:          | Pass  Total
+vcat with cols::Vector |   15     15
+Test Summary: | Pass  Total
+vcat errors   |   32     32
+Test Summary:  | Pass  Total
+vcat with view |    1      1
+	[1m[32mPASSED[0m: cat.jl
+Test Summary: | Pass  Total
+constructors  |   57     57
+Test Summary:                 | Pass  Total
+completecases and dropmissing |  209    209
+Test Summary: | Pass  Total
+merge         |   17     17
+	[1m[32mPASSED[0m: data.jl
+Test Summary:     | Pass  Total
+selector mutation |   12     12
+Test Summary:                    | Pass  Total
+fuzzy matching and ArgumentError |    8      8
+Test Summary:  | Pass  Total
+Regex indexing |   36     36
+Test Summary: | Pass  Total
+Not indexing  |   36     36
+Test Summary:    | Pass  Total
+Between indexing |   20     20
+Test Summary: | Pass  Total
+All indexing  |   25     25
+	[1m[32mPASSED[0m: index.jl
+Test Summary: | Pass  Total
+equality      |    9      9
+Test Summary: | Pass  Total
+copying       |    6      6
+Test Summary:      | Pass  Total
+similar / missings |    2      2
+Test Summary: | Pass  Total
+hasproperty   |    5      5
+Test Summary: | Pass  Total
+insertcols!   |   24     24
+Test Summary:          | Pass  Total
+DataFrame constructors |   19     19
+[91m┌ Error: Error adding value to column :first.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1301
+[0m[91m┌ Error: Error adding value to column :first.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1301
+[0m[91m┌ Error: Error adding value to column :second.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1301
+[0m[91m┌ Error: Error adding value to column :second.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :second.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :first.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :first.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :second.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :y.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1301
+[0m[91m┌ Error: Error adding value to column :a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1301
+[0m[91m┌ Error: Error adding value to column :a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0m[91m┌ Error: Error adding value to column :a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1187
+[0mTest Summary:  | Pass  Total
+push!(df, row) |   51     51
+Test Summary: | Pass  Total
+select! Not   |   13     13
+Test Summary: | Pass  Total
+select Not    |   64     64
+Test Summary:   | Pass  Total
+select Not view |   76     76
+Test Summary: | Pass  Total
+select!       |   35     35
+Test Summary: | Pass  Total
+select        |   66     66
+Test Summary: | Pass  Total
+select view   |   78     78
+Test Summary: | Pass  Total
+deleterows!   |   40     40
+Test Summary: | Pass  Total
+describe      |    6      6
+[91m┌ Error: Error adding value to column B.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1144
+[0m[91m┌ Error: Error adding value to column B.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1144
+[0m[91m┌ Error: Error adding value to column a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1144
+[0m[91m┌ Error: Error adding value to column a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/dataframe/dataframe.jl:1144
+[0mTest Summary: | Pass  Total
+append!       |   18     18
+Test Summary:     | Pass  Total
+test categorical! |   14     14
+Test Summary: | Pass  Total
+categorical!  |   11     11
+Test Summary: | Pass  Total
+rename        |   20     20
+Test Summary: | Pass  Total
+size          |    5      5
+Test Summary: | Pass  Total
+description   |    8      8
+Test Summary:      | Pass  Total
+column conversions |   69     69
+Test Summary:        | Pass  Total
+test disallowmissing |  314    314
+Test Summary:     | Pass  Total
+test allowmissing |  312    312
+Test Summary:    | Pass  Total
+test categorical |  432    432
+Test Summary: | Pass  Total
+similar       |    8      8
+Test Summary:                | Pass  Total
+passing range to a DataFrame |    1      1
+Test Summary:                | Pass  Total
+test getindex using ! syntax |   15     15
+Test Summary:                | Pass  Total
+test corner case of getindex |    2      2
+Test Summary:             | Pass  Total
+empty data frame getindex |    9      9
+Test Summary:               | Pass  Total
+handling of end in indexing |   22     22
+Test Summary:        | Pass  Total
+aliasing in indexing |    5      5
+Test Summary: | Pass  Total
+permutecols!  |   21     21
+Test Summary:                               | Pass  Total
+getproperty, setproperty! and propertynames |   10     10
+Test Summary:          | Pass  Total
+duplicate column names |    1      1
+Test Summary:         | Pass  Total
+parent, size and axes |   11     11
+Test Summary:                | Pass  Total
+0-row DataFrame corner cases |    4      4
+Test Summary:         |
+And and Between tests | No tests
+	[1m[32mPASSED[0m: dataframe.jl
+Test Summary:         | Pass  Total
+the output of unstack |   27     27
+Test Summary:                               | Pass  Total
+unstack promotion to support missing values |    8      8
+[91m┌ Warning: Duplicate entries in unstack at row 3 for key 1 and variable a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/abstractdataframe/reshape.jl:251
+[0m[91m┌ Warning: Duplicate entries in unstack at row 3 for key (1, 1) and variable a.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/abstractdataframe/reshape.jl:331
+[0mTest Summary:                         | Pass  Total
+duplicate entries in unstack warnings |    9      9
+[91m┌ Warning: Missing value in variable variable at row 3. Skipping.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/abstractdataframe/reshape.jl:231
+[0m[91m┌ Warning: Missing value in variable variable at row 3. Skipping.
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/abstractdataframe/reshape.jl:323
+[0mTest Summary:            | Pass  Total
+missing values in colkey |    6      6
+Test Summary:             | Pass  Total
+stack-unstack correctness |    4      4
+Test Summary: | Pass  Total
+reshape       |   69     69
+Test Summary:           | Pass  Total
+column names duplicates |    5      5
+	[1m[32mPASSED[0m: reshape.jl
+Test Summary: | Pass  Total
+constructors  |   28     28
+Test Summary:          | Pass  Total
+getindex and setindex! |   53     53
+Test Summary: | Pass  Total
+equality      |   17     17
+Test Summary: | Pass  Total
+isless        |   13     13
+Test Summary: | Pass  Total
+hashing       |    6      6
+Test Summary: | Pass  Total
+grouping      |    6      6
+Test Summary:                               | Pass  Total
+getproperty, setproperty! and propertynames |    6      6
+Test Summary:                    | Pass  Total
+keys, values and iteration, size |   31     31
+Test Summary:    | Pass  Total
+convert and copy |    6      6
+Test Summary:            | Pass  Total
+parent and parentindices |   34     34
+Test Summary:         | Pass  Total
+iteration and collect |   10     10
+Test Summary:    | Pass  Total
+duplicate column |   12     12
+Test Summary:        | Pass  Total
+conversion and push! |   15     15
+Test Summary: | Pass  Total
+show          |    7      7
+	[1m[32mPASSED[0m: dataframerow.jl
+Test Summary: | Pass  Total
+LaTeX export  |    4      4
+Test Summary:     | Pass  Total
+Huge LaTeX export |    2      2
+Test Summary: | Pass  Total
+HTML output   |   11     11
+Test Summary:   | Pass  Total
+limit attribute |    2      2
+Test Summary: | Pass  Total
+printtable    |    1      1
+Test Summary:  | Pass  Total
+csv/tsv output |    6      6
+Test Summary:                     | Pass  Total
+empty data frame and DataFrameRow |   12     12
+Test Summary: | Pass  Total
+consistency   |    8      8
+	[1m[32mPASSED[0m: io.jl
+Test Summary: | Pass  Total
+constructors  |   42     42
+Test Summary:                          | Pass  Total
+DataFrame keyword argument constructor |   22     22
+Test Summary:         | Pass  Total
+DataFrame constructor |   21     21
+Test Summary:    | Pass  Total
+pair constructor |   11     11
+Test Summary: | Pass  Total
+associative   |    9      9
+Test Summary:       | Pass  Total
+vector constructors |   58     58
+Test Summary: | Pass  Total
+recyclers     |    2      2
+Test Summary:      | Pass  Total
+constructor errors |   11     11
+Test Summary: | Pass  Total
+column types  |    3      3
+Test Summary:      | Pass  Total
+Matrix constructor |    4      4
+Test Summary:          | Pass  Total
+constructor with types |   19     19
+	[1m[32mPASSED[0m: constructors.jl
+Test Summary:    | Pass  Total
+Conversion tests |   44     44
+	[1m[32mPASSED[0m: conversions.jl
+	[1m[32mPASSED[0m: sort.jl
+Test Summary: | Pass  Total
+parent        |    2      2
+Test Summary: | Pass  Total
+consistency   |    2      2
+Test Summary:    | Pass  Total
+accepted columns |    2      2
+Test Summary:                                       | Pass  Total
+by, groupby and map(::Function, ::GroupedDataFrame) |  915    915
+Test Summary:          | Pass  Total
+grouping with missings |  980    980
+Test Summary:            | Pass  Total
+grouping with three keys | 1426   1426
+Test Summary:                           | Pass  Total
+by, combine and map with pair interface |  374    374
+Test Summary:                      | Pass  Total
+combine with aggregation functions |  253    253
+Test Summary:                      | Pass  Total
+combine with aggregation functions |  253    253
+Test Summary:                      | Pass  Total
+combine with aggregation functions |  253    253
+Test Summary:                      | Pass  Total
+combine with aggregation functions |  253    253
+Test Summary:      | Pass  Total
+iteration protocol |    2      2
+Test Summary: | Pass  Total
+getindex      |   29     29
+Test Summary:  | Pass  Total
+== and isequal |   12     12
+Test Summary: | Pass  Total
+show          |   10     10
+Test Summary: | Pass  Total
+DataFrame     |   20     20
+Test Summary:              | Pass  Total
+groupindices and groupvars |    8      8
+	[1m[32mPASSED[0m: grouping.jl
+Test Summary: | Pass  Total
+join types    |   20     20
+Test Summary:       | Pass  Total
+Test empty inputs 1 |   21     21
+Test Summary:       | Pass  Total
+Test empty inputs 2 |   21     21
+Test Summary: | Pass  Total
+issue #960    |    3      3
+Test Summary: | Pass  Total
+all joins     |   30     30
+Test Summary:                    | Pass  Total
+all joins with CategoricalArrays |   32     32
+Test Summary:                                                     | Pass  Total
+maintain CategoricalArray levels ordering on join - non-`on` cols |    6      6
+Test Summary:                                                          | Pass  Total
+maintain CategoricalArray levels ordering on join - ordering conflicts |   10     10
+Test Summary:                                                           | Pass  Total
+maintain CategoricalArray levels ordering on join - left is categorical |   12     12
+Test Summary:                                   | Pass  Total
+join on columns with different left/right names |   18     18
+Test Summary:                  | Pass  Total
+join with a column of type Any |   16     16
+Test Summary:                                       | Pass  Total
+joins with categorical columns and no matching rows |   24     24
+Test Summary:     | Pass  Total
+indicator columns |    4      4
+Test Summary:                       | Pass  Total
+test checks of merge key uniqueness |   18     18
+Test Summary: | Pass  Total
+consistency   |    3      3
+	[1m[32mPASSED[0m: join.jl
+Test Summary: | Pass  Total
+SubDataFrame  |    7      7
+Test Summary:   | Pass  Total
+parent mutation |    4      4
+Test Summary:                 | Pass  Total
+getproperty and propertynames |   33     33
+	[1m[32mPASSED[0m: iteration.jl
+Test Summary: | Pass  Total
+nonunique     |   18     18
+	[1m[32mPASSED[0m: duplicates.jl
+Test Summary:                            | Pass  Total
+Basic show test with allrows and allcols |    9      9
+Test Summary:    | Pass  Total
+displaysize test |    4      4
+Test Summary:             | Pass  Total
+IOContext parameters test |    2      2
+Test Summary:          | Pass  Total
+SubDataFrame show test |    1      1
+Test Summary:                                 | Pass  Total
+Test showing StackedVector and RepeatedVector |    3      3
+Test Summary:                                            | Pass  Total
+Test colors and non-standard values: missing and nothing |    3      3
+Test Summary:                  | Pass  Total
+Test correct width computation |    1      1
+Test Summary:                                                              | Pass  Total
+Test showing special types: strings with escapes, categorical and BigFloat |    3      3
+Test Summary:                              | Pass  Total
+Test using :compact parameter of IOContext |    2      2
+Test Summary:                              | Pass  Total
+Test of DataFrameRows and DataFrameColumns |    6      6
+Test Summary:                          | Pass  Total
+Test empty data frame and DataFrameRow |    3      3
+Test Summary: | Pass  Total
+consistency   |    2      2
+	[1m[32mPASSED[0m: show.jl
+Test Summary:       | Pass  Total
+copy - SubDataFrame |    5      5
+Test Summary:     | Pass  Total
+view -- DataFrame |   77     77
+Test Summary:        | Pass  Total
+view -- SubDataFrame |   62     62
+Test Summary:                               | Pass  Total
+getproperty, setproperty! and propertynames |    8      8
+Test Summary: | Pass  Total
+index         |   10     10
+Test Summary: | Pass  Total
+deleterows!   |    1      1
+Test Summary: | Pass  Total
+parent        |    6      6
+Test Summary:    | Pass  Total
+duplicate column |    6      6
+Test Summary:           | Pass  Total
+conversion to DataFrame |   12     12
+	[1m[32mPASSED[0m: subdataframe.jl
+Test Summary: | Pass  Total
+Tables        |   45     45
+Test Summary: | Pass  Total
+DataFrame!    |    9      9
+Test Summary: | Pass  Total
+columnindex   |    4      4
+	[1m[32mPASSED[0m: tables.jl
+	[1m[31mFAILED[0m: tabletraits.jl
+LoadError: ArgumentError: Package TableTraits not found in current path:
+- Run `import Pkg; Pkg.add("TableTraits")` to install the TableTraits package.
+
+Stacktrace:
+ [1] top-level scope at /opt/julia/packages/DataFrames/yH0f6/test/runtests.jl:46
+ [2] include at ./boot.jl:328 [inlined]
+ [3] include_relative(::Module, ::String) at ./loading.jl:1094
+ [4] include(::Module, ::String) at ./Base.jl:31
+ [5] include(::String) at ./client.jl:431
+ [6] top-level scope at /opt/julia/packages/PackageCompiler/bANkt/sysimg/run_julia_code.jl:4
+ [7] include at ./boot.jl:328 [inlined]
+ [8] include_relative(::Module, ::String) at ./loading.jl:1094
+ [9] include(::Module, ::String) at ./Base.jl:31
+ [10] exec_options(::Base.JLOptions) at ./client.jl:295
+ [11] _start() at ./client.jl:464
+in expression starting at /opt/julia/packages/DataFrames/yH0f6/test/tabletraits.jl:3
+Test Summary:      | Pass  Total
+getindex DataFrame |   89     89
+Test Summary:       | Pass  Total
+getindex df[!, col] |   13     13
+Test Summary:  | Pass  Total
+view DataFrame |  129    129
+Test Summary:         | Pass  Total
+getindex SubDataFrame |  133    133
+Test Summary:     | Pass  Total
+view SubDataFrame |  128    128
+Test Summary:         | Pass  Total
+getindex DataFrameRow |   16     16
+Test Summary:     | Pass  Total
+view DataFrameRow |   17     17
+Test Summary:                             | Pass  Total
+additional tests of post-! getindex rules |  179    179
+[91m┌ Warning: in the future column names in source and target will have to match
+│   caller = top-level scope at indexing.jl:879
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/indexing.jl:879
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated
+│   caller = setindex!(::DataFrame, ::DataFrame, ::UnitRange{Int64}, ::UnitRange{Int64}) at deprecated.jl:1603
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1603
+[0mTest Summary:          | Pass  Total
+setindex! on DataFrame |   43     43
+[91m┌ Warning: in the future column names in source and target will have to match
+│   caller = setindex!(::SubDataFrame{DataFrame,DataFrames.Index,Base.OneTo{Int64}}, ::DataFrame, ::UnitRange{Int64}, ::UnitRange{Int64}) at subdataframe.jl:152
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/subdataframe/subdataframe.jl:152
+[0m[91m┌ Warning: in the future column names in source and target will have to match
+│   caller = setindex!(::SubDataFrame{DataFrame,DataFrames.SubIndex{DataFrames.Index,UnitRange{Int64},UnitRange{Int64}},Base.OneTo{Int64}}, ::DataFrame, ::UnitRange{Int64}, ::UnitRange{Int64}) at subdataframe.jl:152
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/subdataframe/subdataframe.jl:152
+[0m[91m┌ Warning: in the future column names in source and target will have to match
+│   caller = setindex!(::SubDataFrame{DataFrame,DataFrames.Index,UnitRange{Int64}}, ::DataFrame, ::UnitRange{Int64}, ::UnitRange{Int64}) at subdataframe.jl:152
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/subdataframe/subdataframe.jl:152
+[0m[91m┌ Warning: in the future column names in source and target will have to match
+│   caller = setindex!(::SubDataFrame{DataFrame,DataFrames.SubIndex{DataFrames.Index,UnitRange{Int64},UnitRange{Int64}},UnitRange{Int64}}, ::DataFrame, ::UnitRange{Int64}, ::UnitRange{Int64}) at subdataframe.jl:152
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/subdataframe/subdataframe.jl:152
+[0mTest Summary:             | Pass  Total
+setindex! on SubDataFrame |  124    124
+Test Summary:             | Pass  Total
+setindex! on DataFrameRow |   28     28
+	[1m[32mPASSED[0m: indexing.jl
+Test Summary:  | Pass  Total
+CartesianIndex |   24     24
+Test Summary:                             | Pass  Total
+broadcasting of AbstractDataFrame objects |   28     28
+Test Summary:                                    | Pass  Total
+broadcasting of AbstractDataFrame objects errors |   10     10
+Test Summary:          | Pass  Total
+broadcasting expansion |    5      5
+Test Summary:                                          | Pass  Total
+broadcasting of AbstractDataFrame objects corner cases |   34     34
+Test Summary:                                                               | Pass  Total
+normal data frame and data frame row in broadcasted assignment - one column |   79     79
+Test Summary:                                                                 | Pass  Total
+normal data frame and data frame view in broadcasted assignment - two columns |   72     72
+Test Summary:                                       | Pass  Total
+assignment to a whole data frame and data frame row |    8      8
+Test Summary:                                               | Pass  Total
+extending data frame in broadcasted assignment - one column |   20     20
+Test Summary:                | Pass  Total
+empty data frame corner case |   99     99
+Test Summary:           | Pass  Total
+test categorical values |  126    126
+Test Summary:       | Pass  Total
+scalar broadcasting |    3      3
+Test Summary:      | Pass  Total
+tuple broadcasting |    8      8
+Test Summary:             | Pass  Total
+scalar on assignment side |    4      4
+Test Summary: | Pass  Total
+nothing test  |    4      4
+Test Summary: | Pass  Total
+aliasing test |  154    154
+Test Summary: | Pass  Total
+@. test       |    2      2
+Test Summary:     | Pass  Total
+test common cases |   11     11
+Test Summary:                                             | Pass  Total
+data frame only on left hand side broadcasting assignment |   26     26
+Test Summary:                          | Pass  Total
+broadcasting with 3-dimensional object |    4      4
+Test Summary:                                  | Pass  Total
+additional checks of post-! broadcasting rules |  160    160
+Test Summary:                                   | Pass  Total
+DataFrameRow getproperty broadcasted assignment |    4      4
+Test Summary:                                | Pass  Total
+make sure that : is in place and ! allocates |    5      5
+Test Summary:                                            | Pass  Total
+add new correct rules for df[row, col] .= v broadcasting |    6      6
+	[1m[32mPASSED[0m: broadcasting.jl
+[91m┌ Warning: sort(df, cols=cols) is deprecated, use sort(df, cols) instead
+│   caller = ip:0x0
+└ @ Core :-1
+[0m[91m┌ Warning: sort!(df, cols=cols) is deprecated, use sort!(df, cols) instead
+│   caller = ip:0x0
+└ @ Core :-1
+[0mTest Summary: | Pass  Total
+identifier    |    6      6
+Test Summary:  |
+reserved words | No tests
+[91m┌ Warning: Unable to validate reserved words against parser. 
+│   Expected if Julia was not built from source. = "Expected if Julia was not built from source."
+└ @ Main.TestDeprecated /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:48
+[0m[91m┌ Warning: combine(gd) is deprecated, use DataFrame(gd) instead
+│   caller = top-level scope at deprecated.jl:57
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:57
+[0m[91m┌ Warning: `DataFrame` constructor with `categorical` positional argument is deprecated. Instead use `DataFrame(columns, names)` constructor.
+│   caller = top-level scope at deprecated.jl:60
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:60
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:61
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:61
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:62
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:62
+[0m[91m┌ Warning: `DataFrame` constructor with `categorical` positional argument is deprecated. Instead use `DataFrame(columns, names)` constructor.
+│   caller = top-level scope at deprecated.jl:63
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:63
+[0mTest Summary:           | Pass  Total
+categorical constructor |    3      3
+[91m┌ Warning: `DataFrame(t::Type, nrows::Integer, ncols::Integer)` is deprecated, use `DataFrame([Vector{t}(undef, nrows) for i = 1:ncols])` instead.
+│   caller = top-level scope at deprecated.jl:67
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:67
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:70
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:70
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:71
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:71
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:72
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:72
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:73
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:73
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:74
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:74
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:75
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:75
+[0m[91m┌ Warning: `DataFrame(column_eltypes::AbstractVector{<:Type}, nrows::Integer)` is deprecated, use `DataFrame(column_eltypes, Symbol.('x' .* string.(1:length(column_eltypes))), nrows)` instead.
+│   caller = top-level scope at deprecated.jl:83
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:83
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:86
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:86
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:87
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:87
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:88
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:88
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:89
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:89
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:90
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:90
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:91
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:91
+[0m[91m┌ Warning: `DataFrame` constructor with `categorical` positional argument is deprecated. Instead use `DataFrame(columns, names)` constructor.
+│   caller = top-level scope at deprecated.jl:99
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:99
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:103
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:103
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:104
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:104
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:105
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:105
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:106
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:106
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:107
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:107
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:108
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:108
+[0mTest Summary:          | Pass  Total
+DataFrame constructors |   42     42
+[91m┌ Warning: `DataFrame(t::Type, nrows::Integer, ncols::Integer)` is deprecated, use `DataFrame([Vector{t}(undef, nrows) for i = 1:ncols])` instead.
+│   caller = top-level scope at deprecated.jl:117
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:117
+[0m[91m┌ Warning: `DataFrame(column_eltypes::AbstractVector{<:Type}, nrows::Integer)` is deprecated, use `DataFrame(column_eltypes, Symbol.('x' .* string.(1:length(column_eltypes))), nrows)` instead.
+│   caller = top-level scope at deprecated.jl:121
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:121
+[0m[91m┌ Warning: `colwise(f, d::AbstractDataFrame)` is deprecated, use `[f(col) for col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:132
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:132
+[0m[91m┌ Warning: `colwise(f, d::AbstractDataFrame)` is deprecated, use `[f(col) for col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:138
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:138
+[0m[91m┌ Warning: `colwise(f, gd::GroupedDataFrame)` is deprecated, use `[[f(col) for col = eachcol(d)] for d = gd]` instead.
+│   caller = top-level scope at deprecated.jl:147
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:147
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, d::AbstractDataFrame)` is deprecated, use `[f(col) for f = fns, col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:151
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:151
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, d::AbstractDataFrame)` is deprecated, use `[f(col) for f = fns, col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:157
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:157
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, d::AbstractDataFrame)` is deprecated, use `[f(col) for f = fns, col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:163
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:163
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, d::AbstractDataFrame)` is deprecated, use `[f(col) for f = fns, col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:169
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:169
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, gd::GroupedDataFrame)` is deprecated, use `[[f(col) for f = fns, col = eachcol(d)] for d = gd]` instead.
+│   caller = top-level scope at deprecated.jl:174
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:174
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, d::AbstractDataFrame)` is deprecated, use `[f(col) for f = fns, col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:178
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:178
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, d::AbstractDataFrame)` is deprecated, use `[f(col) for f = fns, col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:184
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:184
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, d::AbstractDataFrame)` is deprecated, use `[f(col) for f = fns, col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:190
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:190
+[0m[91m┌ Warning: `colwise(fns::Union{AbstractVector, Tuple}, d::AbstractDataFrame)` is deprecated, use `[f(col) for f = fns, col = eachcol(d)]` instead.
+│   caller = top-level scope at deprecated.jl:197
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:197
+[0m[91m┌ Warning: `colwise(f, gd::GroupedDataFrame)` is deprecated, use `[[f(col) for col = eachcol(d)] for d = gd]` instead.
+│   caller = top-level scope at deprecated.jl:202
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:202
+[0mTest Summary: | Pass  Total
+colwise       |   29     29
+[91m┌ Warning: `empty!(df::DataFrame)` is deprecated, use `select!(df, Int[])` instead.
+│   caller = top-level scope at deprecated.jl:212
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:212
+[0mTest Summary: | Pass  Total
+empty!        |    5      5
+[91m┌ Warning: `deletecols(df::DataFrame, inds; copycols::Bool=true)` is deprecated, use `select(df, Not(inds), copycols=copycols)` instead.
+│   caller = top-level scope at deprecated.jl:220
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:220
+[0m[91m┌ Warning: `deletecols!(df::DataFrame, inds)` is deprecated, use `select!(df, Not(inds))` instead.
+│   caller = top-level scope at deprecated.jl:221
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:221
+[0m[91m┌ Warning: `deletecols(df::DataFrame, inds; copycols::Bool=true)` is deprecated, use `select(df, Not(inds), copycols=copycols)` instead.
+│   caller = top-level scope at deprecated.jl:225
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:225
+[0m[91m┌ Warning: `deletecols!(df::DataFrame, inds)` is deprecated, use `select!(df, Not(inds))` instead.
+│   caller = top-level scope at deprecated.jl:226
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:226
+[0m[91m┌ Warning: `deletecols(df::DataFrame, inds; copycols::Bool=true)` is deprecated, use `select(df, Not(inds), copycols=copycols)` instead.
+│   caller = ip:0x0
+└ @ Core :-1
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:230
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:230
+[0m[91m┌ Warning: `deletecols(df::DataFrame, inds; copycols::Bool=true)` is deprecated, use `select(df, Not(inds), copycols=copycols)` instead.
+│   caller = top-level scope at deprecated.jl:231
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:231
+[0m[91m┌ Warning: `deletecols(df::DataFrame, inds; copycols::Bool=true)` is deprecated, use `select(df, Not(inds), copycols=copycols)` instead.
+│   caller = top-level scope at deprecated.jl:232
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:232
+[0mTest Summary:              | Pass  Total
+deletecols and deletecols! |    7      7
+[91m┌ Warning: `haskey(df::AbstractDataFrame, key::Integer)` is deprecated, use `key in 1:ncol(df)` instead.
+│   caller = top-level scope at deprecated.jl:237
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:237
+[0m[91m┌ Warning: `haskey(df::AbstractDataFrame, key::Integer)` is deprecated, use `key in 1:ncol(df)` instead.
+│   caller = top-level scope at deprecated.jl:238
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:238
+[0m[91m┌ Warning: `haskey(df::AbstractDataFrame, key::Integer)` is deprecated, use `key in 1:ncol(df)` instead.
+│   caller = top-level scope at deprecated.jl:239
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:239
+[0m[91m┌ Warning: `haskey(df::AbstractDataFrame, key::Integer)` is deprecated, use `key in 1:ncol(df)` instead.
+│   caller = top-level scope at deprecated.jl:240
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:240
+[0m[91m┌ Warning: `haskey(df::AbstractDataFrame, key::Symbol)` is deprecated, use `hasproperty(df, key)` instead.
+│   caller = top-level scope at deprecated.jl:241
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:241
+[0m[91m┌ Warning: `haskey(df::AbstractDataFrame, key::Symbol)` is deprecated, use `hasproperty(df, key)` instead.
+│   caller = top-level scope at deprecated.jl:242
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:242
+[0mTest Summary: | Pass  Total
+haskey        |    7  [91m┌ Warning: `haskey(df::AbstractDataFrame, key::Any)` is deprecated, use `key in 1:ncol(df) || key in names(df)` instead.
+│   caller = top-level scope at deprecated.jl:243
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:243
+[0m    7
+[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:249
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:249
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:250
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:250
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:251
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:251
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:252
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:252
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:253
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:253
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:254
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:254
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:255
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:255
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:256
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:256
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:257
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:257
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:258
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:258
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:259
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:259
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:260
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:260
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:261
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:261
+[0m[91m┌ Warning: `getindex(df::DataFrame, ::Colon)` is deprecated, use `df[:, :]` instead.
+│   caller = top-level scope at deprecated.jl:262
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:262
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:263
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:263
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:264
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:264
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:265
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:265
+[0m[91m┌ Warning: `getindex(df::DataFrame, ::Colon)` is deprecated, use `df[:, :]` instead.
+│   caller = top-level scope at deprecated.jl:266
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:266
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:267
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:267
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:268
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:268
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:269
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:269
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:270
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:270
+[0m[91m┌ Warning: `getindex(df::DataFrame, ::Colon)` is deprecated, use `df[:, :]` instead.
+│   caller = top-level scope at deprecated.jl:271
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:271
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:272
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:272
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:273
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:273
+[0m[91m┌ Warning: `getindex(df::DataFrame, ::Colon)` is deprecated, use `df[:, :]` instead.
+│   caller = top-level scope at deprecated.jl:274
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:274
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:275
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:275
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:276
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:276
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:281
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:281
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:282
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:282
+[0m[91m┌ Warning: `getindex(df::DataFrame, ::Colon)` is deprecated, use `df[:, :]` instead.
+│   caller = top-level scope at deprecated.jl:283
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:283
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:284
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:284
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:285
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:285
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:286
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:286
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colind::ColumnIndex)` is deprecated, use `view(adf, :, colind)` instead.
+│   caller = top-level scope at deprecated.jl:290
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:290
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colind::ColumnIndex)` is deprecated, use `view(adf, :, colind)` instead.
+│   caller = top-level scope at deprecated.jl:291
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:291
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:292
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:292
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:293
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:293
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:293
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:293
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:294
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:294
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:295
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:295
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:295
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:295
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:296
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:296
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:297
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:297
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:297
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:297
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:298
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:298
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:299
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:299
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:300
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:300
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:301
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:301
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:302
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:302
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:303
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:303
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:304
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:304
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:305
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:305
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:306
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:306
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colind::ColumnIndex)` is deprecated, use `sdf[!, colind]` instead.
+│   caller = top-level scope at deprecated.jl:311
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:311
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colind::ColumnIndex)` is deprecated, use `sdf[!, colind]` instead.
+│   caller = top-level scope at deprecated.jl:312
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:312
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:313
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:313
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:314
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:314
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:315
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:315
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:316
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:316
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:317
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:317
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:318
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:318
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, ::Colon)` is deprecated, use `sdf[!, :]` instead.
+│   caller = top-level scope at deprecated.jl:319
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:319
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, ::Colon)` is deprecated, use `sdf[!, :]` instead.
+│   caller = top-level scope at deprecated.jl:320
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:320
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:321
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:321
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:322
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:322
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:323
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:323
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:324
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:324
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, ::Colon)` is deprecated, use `sdf[!, :]` instead.
+│   caller = top-level scope at deprecated.jl:325
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:325
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:326
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:326
+[0m[91m┌ Warning: `getindex(sdf::SubDataFrame, colinds::Union{AbstractVector, Regex, Not})` is deprecated, use `sdf[!, colinds]` instead.
+│   caller = top-level scope at deprecated.jl:327
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:327
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colind::ColumnIndex)` is deprecated, use `view(adf, :, colind)` instead.
+│   caller = top-level scope at deprecated.jl:332
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:332
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colind::ColumnIndex)` is deprecated, use `view(adf, :, colind)` instead.
+│   caller = top-level scope at deprecated.jl:333
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:333
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:334
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:334
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:335
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:335
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:336
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:336
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:337
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:337
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:338
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:338
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:339
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:339
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:340
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:340
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:341
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:341
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:342
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:342
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:343
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:343
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:344
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:344
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:345
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:345
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:346
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:346
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:347
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:347
+[0m[91m┌ Warning: `view(adf::AbstractDataFrame, colinds)` is deprecated, use `view(adf, :, colinds)` instead.
+│   caller = top-level scope at deprecated.jl:348
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:348
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment
+│   caller = top-level scope at deprecated.jl:356
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:356
+[0m[91m┌ Warning: `setindex!(df::DataFrame, new_df::DataFrame, row_ind::Integer, col_inds::AbstractVector{<:ColumnIndex})` is deprecated, use `begin
+│     foreach((((i, c),)->begin
+│                 df[row_ind, c] = new_df[1, i]
+│             end), enumerate(col_inds))
+│     df
+│ end` instead.
+│   caller = setindex!(::DataFrame, ::DataFrame, ::Int64, ::Colon) at deprecated.jl:1576
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1576
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment
+│   caller = top-level scope at deprecated.jl:357
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:357
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment
+│   caller = top-level scope at deprecated.jl:358
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:358
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment
+│   caller = top-level scope at deprecated.jl:361
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:361
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::Any, row_ind::Integer, col_inds::AbstractVector{<:ColumnIndex})` is deprecated, use `begin
+│     df[row_ind, col_inds] .= Ref(v)
+│     df
+│ end` instead.
+│   caller = setindex!(::DataFrame, ::Int64, ::Int64, ::Colon) at deprecated.jl:1576
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1576
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment
+│   caller = top-level scope at deprecated.jl:362
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:362
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = setindex!(::DataFrame, ::Int64, ::UnitRange{Int64}, ::Colon) at deprecated.jl:1576
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1576
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment
+│   caller = top-level scope at deprecated.jl:363
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:363
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = setindex! at deprecated.jl:1544 [inlined]
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1544
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment
+│   caller = top-level scope at deprecated.jl:366
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:366
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= v` broadcasting assignment to change the columns in place
+│   caller = setindex!(::DataFrame, ::Array{Int64,1}, ::UnitRange{Int64}, ::Colon) at deprecated.jl:1576
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1576
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment
+│   caller = top-level scope at deprecated.jl:367
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:367
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= v` broadcasting assignment to change the columns in place
+│   caller = setindex! at deprecated.jl:1513 [inlined]
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1513
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, ::Colon, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:370
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:370
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[:, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = top-level scope at deprecated.jl:373
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:373
+[0m[91m┌ Warning: Implicit broadcasting to an existing column in DataFrame assignment is deprecated.Use an explicit broadcast with `df[:, col_ind] .= v`
+│   caller = setindex!(::DataFrame, ::Int64, ::Colon, ::Int64) at deprecated.jl:1584
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1584
+[0m[91m┌ Warning: Implicit broadcasting to an existing column in DataFrame assignment is deprecated.Use an explicit broadcast with `df[:, col_ind] .= v`
+│   caller = top-level scope at deprecated.jl:374
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:374
+[0m[91m┌ Warning: `setindex!(df::DataFrame, new_df::DataFrame, row_ind::Integer, col_inds::AbstractVector{<:ColumnIndex})` is deprecated, use `begin
+│     foreach((((i, c),)->begin
+│                 df[row_ind, c] = new_df[1, i]
+│             end), enumerate(col_inds))
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:377
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:377
+[0m[91m┌ Warning: in the future column names in source and target will have to match
+│   caller = top-level scope at deprecated.jl:378
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:378
+[0m[91m┌ Warning: in the future column names in source and target will have to match
+│   caller = top-level scope at deprecated.jl:379
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:379
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::Any, row_ind::Integer, col_inds::AbstractVector{<:ColumnIndex})` is deprecated, use `begin
+│     df[row_ind, col_inds] .= Ref(v)
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:382
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:382
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = top-level scope at deprecated.jl:383
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:383
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = setindex!(::DataFrame, ::Int64, ::Array{Bool,1}, ::UnitRange{Int64}) at deprecated.jl:1544
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1544
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= v` broadcasting assignment to change the columns in place
+│   caller = top-level scope at deprecated.jl:387
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:387
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[row_inds, col_inds] .= v` broadcasting assignment to change the columns in place
+│   caller = setindex!(::DataFrame, ::Array{Int64,1}, ::Array{Bool,1}, ::UnitRange{Int64}) at deprecated.jl:1513
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1513
+[0m[91m┌ Warning: `setindex!(df::DataFrame, new_df::DataFrame, row_ind::Integer, col_inds::AbstractVector{<:ColumnIndex})` is deprecated, use `begin
+│     foreach((((i, c),)->begin
+│                 df[row_ind, c] = new_df[1, i]
+│             end), enumerate(col_inds))
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:392
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:392
+[0m[91m┌ Warning: `setindex!(df::DataFrame, new_df::DataFrame, row_ind::Integer, col_inds::AbstractVector{Bool})` is deprecated, use `begin
+│     foreach((((i, c),)->begin
+│                 df[row_ind, c] = new_df[1, i]
+│             end), enumerate(findall(col_inds)))
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:396
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:396
+[0m[91m┌ Warning: Implicit broadcasting to a new column in DataFrame assignment is deprecated.Use `df[!, col_ind] .= v`  when `df` has some columns
+│   caller = top-level scope at deprecated.jl:403
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:403
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:410
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:410
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:411
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:411
+[0m[91m┌ Warning: Implicit broadcasting to a new column in DataFrame assignment is deprecated.Use `df[!, col_ind] .= v`  when `df` has some columns
+│   caller = top-level scope at deprecated.jl:414
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:414
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:415
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:415
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:423
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:423
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:424
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:424
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:425
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:425
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:425
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:425
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:426
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:426
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:426
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:426
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:427
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:427
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:427
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:427
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:428
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:428
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:428
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:428
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:429
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:429
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:429
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:429
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:430
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:430
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:430
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:430
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:431
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:431
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:431
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:431
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:432
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:432
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:432
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:432
+[0m[91m┌ Warning: `getindex(df::DataFrame, ::Colon)` is deprecated, use `df[:, :]` instead.
+│   caller = top-level scope at deprecated.jl:433
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:433
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:433
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:433
+[0m[91m┌ Warning: `getindex(df::DataFrame, ::Colon)` is deprecated, use `df[:, :]` instead.
+│   caller = top-level scope at deprecated.jl:434
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:434
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:434
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:434
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:435
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:435
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:435
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:435
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:436
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:436
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:436
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:436
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:441
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:441
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:442
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:442
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:443
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:443
+[0m[91m┌ Warning: In the future setindex! will disallow adding columnsto a DataFrame using integer index. Use a Symbol to specify a column name instead.
+│   caller = setindex!(::DataFrame, ::Array{Int64,1}, ::Int64) at deprecated.jl:67
+└ @ DataFrames ./deprecated.jl:67
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:444
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:444
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:459
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:459
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_ind::ColumnIndex)` is deprecated, use `df[!, col_ind]` instead.
+│   caller = top-level scope at deprecated.jl:459
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:459
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:460
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:460
+[0m[91m┌ Warning: `getindex(df::DataFrame, col_inds::Union{AbstractVector, Regex, Not})` is deprecated, use `df[:, col_inds]` instead.
+│   caller = top-level scope at deprecated.jl:460
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:460
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:462
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:462
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:463
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:463
+[0m[91m┌ Warning: `setindex!(df::DataFrame, new_df::DataFrame, col_inds::AbstractVector{<:ColumnIndex})` is deprecated, use `foreach((((j, colind),)->begin
+│             df[!, colind] = new_df[!, j]
+│         end), enumerate(col_inds))` instead.
+│   caller = top-level scope at deprecated.jl:465
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:465
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:466
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:466
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_ind::ColumnIndex)` is deprecated, use `begin
+│     df[!, col_ind] = v
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:467
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:467
+[0m[91m┌ Warning: in the future column names in source and target will have to match
+│   caller = setindex!(::SubDataFrame{DataFrame,DataFrames.Index,UnitRange{Int64}}, ::DataFrame, ::UnitRange{Int64}) at subdataframe.jl:145
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/subdataframe/subdataframe.jl:145
+[0m[91m┌ Warning: implicit broadcasting in setindex! is deprecated; use `df[:, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = top-level scope at deprecated.jl:475
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:475
+[0m[91m┌ Warning: Implicit broadcasting to an existing column in DataFrame assignment is deprecated.Use an explicit broadcast with `df[:, col_ind] .= v`
+│   caller = setindex!(::DataFrame, ::Float64, ::UnitRange{Int64}) at deprecated.jl:1456
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1456
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[:, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = top-level scope at deprecated.jl:480
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:480
+[0m[91m┌ Warning: implicit broadcasting in setindex! is deprecated; use `df[:, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = setindex!(::DataFrame, ::Float64, ::Colon, ::UnitRange{Int64}) at deprecated.jl:1584
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1584
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_inds::AbstractVector{<:ColumnIndex})` is deprecated, use `begin
+│     foreach((c->begin
+│                 df[!, c] = copy(v)
+│             end), col_inds)
+│     df
+│ end` instead.
+│   caller = top-level scope at deprecated.jl:487
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:487
+[0m[91m┌ Warning: implicit vector broadcasting in setindex! is deprecated; use `df[:, col_inds] .= Ref(v)` broadcasting assignment to change the columns in place
+│   caller = top-level scope at deprecated.jl:496
+└ @ Core /opt/julia/packages/DataFrames/yH0f6/test/deprecated.jl:496
+[0m[91m┌ Warning: `setindex!(df::DataFrame, v::AbstractVector, col_inds::AbstractVector{<:ColumnIndex})` is deprecated, use `begin
+│     foreach((c->begin
+│                 df[!, c] = copy(v)
+│             end), col_inds)
+│     df
+│ end` instead.
+│   caller = setindex!(::DataFrame, ::Array{Float64,1}, ::Colon, ::UnitRange{Int64}) at deprecated.jl:1584
+└ @ DataFrames /opt/julia/packages/DataFrames/yH0f6/src/deprecated.jl:1584
+[0mTest Summary:                                        | Pass  Total
+df[col] and df[col] for getindex, view, and setindex |  132    132
+	[1m[32mPASSED[0m: deprecated.jl
+[91m┌ Warning: Snoop file errored. Precompile statements were recorded until error!
+│   exception =
+│    LoadError: "Tests failed"
+│    in expression starting at /opt/julia/packages/DataFrames/yH0f6/test/runtests.jl:52
+└ @ Main /opt/julia/packages/PackageCompiler/bANkt/sysimg/run_julia_code.jl:6
+[0mthread = 1 warning: only found 7 / 8 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: error parsing Int64 on row = 1, col = 1: "abc
+", error=INVALID: SENTINEL | NEWLINE | EOF | INVALID_DELIMITER 
+testing test_utf8_with_BOM.csv
+testing test_utf8.csv
+testing test_windows.csv
+testing test_single_column.csv
+testing test_empty_file.csv
+testing test_empty_file_newlines.csv
+testing test_simple_quoted.csv
+testing test_quoted_delim_and_newline.csv
+testing test_quoted_numbers.csv
+testing test_crlf_line_endings.csv
+testing test_newline_line_endings.csv
+testing test_mac_line_endings.csv
+testing test_no_header.csv
+testing test_2_footer_rows.csv
+testing test_footer_missing.csv
+testing test_footer_missing.csv
+testing test_dates.csv
+testing test_excel_date_formats.csv
+testing test_datetimes.csv
+testing test_missing_value_NULL.csv
+testing test_missing_value_NULL.csv
+testing test_missing_value.csv
+testing test_header_range.csv
+testing test_header_int_list.csv
+testing test_basic.csv
+testing test_basic_pipe.csv
+testing test_tab_null_empty.txt
+testing test_tab_null_string.txt
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=5, maxsize=Inf, ptr=1, mark=-1)
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=0, maxsize=Inf, ptr=1, mark=-1)
+testing dash_as_null.csv
+testing plus_as_null.csv
+testing comma_decimal.csv
+testing double_quote_quotechar_and_escapechar.csv
+testing census.txt
+testing bools.csv
+testing attenu.csv
+testing test_null_only_column.csv
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=20, maxsize=Inf, ptr=1, mark=-1)
+testing categorical.csv
+testing categorical.csv
+testing categorical.csv
+testing categorical.csv
+testing baseball.csv
+testing FL_insurance_sample.csv
+testing FL_insurance_sample.csv
+testing SacramentocrimeJanuary2006.csv
+testing Sacramentorealestatetransactions.csv
+testing SalesJan2009.csv
+testing stocks.csv
+testing TechCrunchcontinentalUSA.csv
+testing Fielding.csv
+testing latest (1).csv
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=16, maxsize=Inf, ptr=1, mark=-1)
+testing issue_198.csv
+testing issue_198_part2.csv
+thread = 1 warning: parsed expected 3 columns, but didn't reach end of line on data row: 2. Ignoring any extra columns on this row
+thread = 1 warning: parsed expected 3 columns, but didn't reach end of line on data row: 3. Ignoring any extra columns on this row
+thread = 1 warning: parsed expected 3 columns, but didn't reach end of line on data row: 2. Ignoring any extra columns on this row
+thread = 1 warning: parsed expected 3 columns, but didn't reach end of line on data row: 3. Ignoring any extra columns on this row
+testing issue_207.csv
+thread = 1 warning: only found 5 / 6 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 5 / 6 columns on data row: 2. Filling remaining columns with `missing`
+testing issue_120.csv
+testing pandas_zeros.csv
+testing transposed.csv
+testing transposed_1row.csv
+testing transposed_emtpy.csv
+testing transposed_extra_newline.csv
+testing transposed_noheader.csv
+testing transposed_noheader.csv
+testing test_utf8.csv
+testing test_utf8.csv
+testing test_multiple_missing.csv
+testing test_openclosequotes.csv
+testing test_truestrings.csv
+testing test_truestrings.csv
+testing test_string_delimiters.csv
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=20, maxsize=Inf, ptr=1, mark=-1)
+testing test_basic.csv
+testing test_basic.csv
+testing test_truestrings.csv
+testing test_repeated_delimiters.csv
+testing test_comments1.csv
+testing test_comments_multiple.csv
+testing test_comments_multichar.csv
+testing test_not_enough_columns.csv
+thread = 1 warning: only found 3 / 5 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 3 / 5 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 3 / 5 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 3 / 5 columns on data row: 2. Filling remaining columns with `missing`
+testing test_not_enough_columns2.csv
+thread = 1 warning: only found 3 / 5 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 3 / 5 columns on data row: 2. Filling remaining columns with `missing`
+testing test_correct_trailing_missings.csv
+thread = 1 warning: only found 4 / 5 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 4 / 5 columns on data row: 2. Filling remaining columns with `missing`
+testing norwegian_data.csv
+testing test_duplicate_columnnames.csv
+testing test_bad_datetime.csv
+testing test_types.csv
+thread = 1 warning: only found 7 / 8 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 7 / 8 columns on data row: 1. Filling remaining columns with `missing`
+testing test_issue_326.wsv
+testing test_missing_last_field.csv
+thread = 1 warning: only found 2 / 3 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 2 / 3 columns on data row: 2. Filling remaining columns with `missing`
+testing test_delim.tsv
+testing test_delim.wsv
+testing test_comment_first_row.csv
+testing test_comment_first_row.csv
+testing test_repeated_delim_371.csv
+testing test_file_issue_154.csv
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=16, maxsize=Inf, ptr=1, mark=-1)
+thread = 1 warning: only found 2 / 3 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 2 / 3 columns on data row: 2. Filling remaining columns with `missing`
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=19, maxsize=Inf, ptr=1, mark=-1)
+thread = 1 warning: only found 1 / 3 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 1 / 3 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 1 / 3 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 1 / 3 columns on data row: 2. Filling remaining columns with `missing`
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=19, maxsize=Inf, ptr=1, mark=-1)
+thread = 1 warning: only found 1 / 3 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 1 / 3 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 1 / 3 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 1 / 3 columns on data row: 2. Filling remaining columns with `missing`
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=43, maxsize=Inf, ptr=1, mark=-1)
+thread = 1 warning: parsed expected 5 columns, but didn't reach end of line on data row: 1. Ignoring any extra columns on this row
+thread = 1 warning: parsed expected 5 columns, but didn't reach end of line on data row: 2. Ignoring any extra columns on this row
+thread = 1 warning: parsed expected 5 columns, but didn't reach end of line on data row: 3. Ignoring any extra columns on this row
+thread = 1 warning: parsed expected 5 columns, but didn't reach end of line on data row: 1. Ignoring any extra columns on this row
+thread = 1 warning: parsed expected 5 columns, but didn't reach end of line on data row: 2. Ignoring any extra columns on this row
+thread = 1 warning: parsed expected 5 columns, but didn't reach end of line on data row: 3. Ignoring any extra columns on this row
+testing IOBuffer(data=UInt8[...], readable=true, writable=false, seekable=true, append=false, size=17, maxsize=Inf, ptr=1, mark=-1)
+testing heat_flux.dat
+testing log001_vehicle_status_flags_0.txt
+testing fecal_samples.csv
+header is: 1, datarow computed as: 2
+headerpos = 4, datapos = 481
+estimated rows: 756
+detected delimiter: ","
+column names detected: Symbol[:SampleID, :Mother_Child, :SubjectID, :MaternalID, :TimePoint, :Fecal_EtOH, :CollectionRep, :DOC, :RAInitials_DOC, :DOF, :RAInitials_DOF, :Date_Brought_In, :RAInitials_Brought, :Date_Shipped, :RAInitials_Shipped, :Date_Aliquoted, :Number_Replicates, :RAInitials_Aliquot, :StorageBox, :DOE, :Extract_number, :AliquotRep, :DNABox, :KitUsed, :RAInitials_Extract, :DNAConc, :DOM, :Mgx_processed, :Mgx_batch, :DO16S, :_16S_processed, :_16S_batch, :_16S_plate, :Notes, :Discrepancies, :Batch_1_Mapping, :Mgx_batch_Mapping, :_16S_batch_Mapping, :Mother_Child_Dyads]
+byte position of data computed at: 481
+thread = 1 warning: only found 38 / 39 columns on data row: 1079. Filling remaining columns with `missing`
+header is: 1, datarow computed as: 2
+headerpos = 4, datapos = 481
+estimated rows: 756
+detected delimiter: ","
+column names detected: Symbol[:SampleID, :Mother_Child, :SubjectID, :MaternalID, :TimePoint, :Fecal_EtOH, :CollectionRep, :DOC, :RAInitials_DOC, :DOF, :RAInitials_DOF, :Date_Brought_In, :RAInitials_Brought, :Date_Shipped, :RAInitials_Shipped, :Date_Aliquoted, :Number_Replicates, :RAInitials_Aliquot, :StorageBox, :DOE, :Extract_number, :AliquotRep, :DNABox, :KitUsed, :RAInitials_Extract, :DNAConc, :DOM, :Mgx_processed, :Mgx_batch, :DO16S, :_16S_processed, :_16S_batch, :_16S_plate, :Notes, :Discrepancies, :Batch_1_Mapping, :Mgx_batch_Mapping, :_16S_batch_Mapping, :Mother_Child_Dyads]
+byte position of data computed at: 481
+computed typecodes are: Int8[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+thread = 1 warning: didn't pre-allocate enough tape while parsing, re-allocating...
+thread = 1 warning: only found 38 / 39 columns on data row: 1079. Filling remaining columns with `missing`
+time for initial parsing to tape: 0.0030019283294677734
+types after parsing: Type[String, PooledString, Int64, String, Int64, PooledString, Int64, Date, Union{Missing, PooledString}, Union{Missing, Date}, Union{Missing, PooledString}, Union{Missing, Date}, Union{Missing, PooledString}, Union{Missing, Date}, Union{Missing, PooledString}, Union{Missing, Date}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, Date}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, Float64}, Union{Missing, Date}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, Date}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, String}, Union{Missing, PooledString}, Union{Missing, String}, Union{Missing, PooledString}, Union{Missing, PooledString}, Union{Missing, Int64}], pool = 0.1
+testing time.csv
+testing escaped_pooled.csv
+testing error_comment.txt
+thread = 1 warning: only found 3 / 5 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 3 / 5 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: only found 4 / 5 columns on data row: 2. Filling remaining columns with `missing`
+CSV.Rows("<Base.GenericIOBuffer{Array{UInt8,1}}>"):
+Size: 1
+Tables.Schema:
+ :X  Union{Missing, String}thread = 1 warning: only found 1 / 3 columns on data row: 1. Filling remaining columns with `missing`
+thread = 1 warning: only found 2 / 3 columns on data row: 2. Filling remaining columns with `missing`
+thread = 1 warning: parsed expected 3 columns, but didn't reach end of line on data row: 2. Ignoring any extra columns on this row
+Test Summary: | Pass  Total
+CSV           | 1171   1171
+Build shared library "/opt/julia/packages/PackageCompiler/bANkt/sysimg/sys.so":
+  `cc -shared '-DJULIAC_PROGRAM_LIBNAME="/opt/julia/packages/PackageCompiler/bANkt/sysimg/sys.so"' -o /opt/julia/packages/PackageCompiler/bANkt/sysimg/sys.so -Wl,--whole-archive /opt/julia/packages/PackageCompiler/bANkt/sysimg/sys.a -Wl,--no-whole-archive -std=gnu99 -I/opt/julia-1.2.0/include/julia -DJULIA_ENABLE_THREADING=1 -fPIC -L/opt/julia-1.2.0/lib -Wl,--export-dynamic -Wl,-rpath,/opt/julia-1.2.0/lib -Wl,-rpath,/opt/julia-1.2.0/lib/julia -ljulia -m64 -O3`
+Removing intermediate container a65a621893fd
+ ---> 2b5d803c58c4
+Step 26/44 : RUN julia -e "using Pkg; pkg\"precompile\""
+ ---> Running in cfeb25477bb0
+Precompiling project...
+Precompiling DataVoyager
+Precompiling RegressionTables
+[91mWARNING: could not import FixedEffectModels.FixedEffectModel into RegressionTables
+WARNING: could not import FixedEffectModels.has_fe into RegressionTables
+WARNING: could not import FixedEffectModels.has_iv into RegressionTables
+[0m[91mWARNING: could not import StatsModels.TableRegressionModel into RegressionTables
+[0m[91mERROR: [0m[91mLoadError: LoadError: [0m[91mUndefVarError: FixedEffectModel not defined[0m[91m
+Stacktrace:[0m[91m
+ [1] top-level scope at /opt/julia/packages/RegressionTables/2vDBE/src/util/util.jl:2
+ [2] [0m[91minclude at ./boot.jl:328 [inlined]
+ [3] [0m[91minclude_relative(::Module, ::[0m[91mString) at ./loading.jl:1094
+ [4] include at ./Base.jl:31 [inlined][0m[91m
+ [5] include(::String) at /opt/julia/packages/RegressionTables/2vDBE/src/RegressionTables.jl:3
+ [6] top-level scope at /opt/julia/packages/RegressionTables/2vDBE/src/RegressionTables.jl:67
+ [7] include at ./boot.jl:328 [inlined]
+ [8] include_relative(::Module, [0m[91m::String) at [0m[91m./loading.jl:1094
+ [9] include(::Module, ::String) at ./Base.jl:31
+ [10] top-level scope at none:2
+ [11] eval at ./boot.jl:330[0m[91m [inlined][0m[91m
+ [12] eval(::[0m[91mExpr) at ./client.jl:432
+ [13] top-level scope at ./none:3
+in expression starting at /opt/julia/packages/RegressionTables/2vDBE/src/util/util.jl:2
+in expression starting at /opt/julia/packages/RegressionTables/2vDBE/src/RegressionTables.jl:67
+[0mPrecompiling StochasticDiffEq
+Precompiling DiffEqJump
+Precompiling Zygote
+Precompiling Expectations
+Precompiling LeastSquaresOptim
+Precompiling DualNumbers
+Precompiling Queryverse
+Precompiling Revise
+Precompiling BenchmarkTools
+Precompiling DataFramesMeta
+Precompiling Images
+[91m┌ Warning: Replacing module `Images`
+└ @ Base loading.jl:931
+[0m[91mWARNING: Method definition var(AbstractArray{C<:(ColorTypes.Color{T, 1} where T), N} where N) where {C<:(ColorTypes.Color{T, 1} where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:80 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:80.
+  ** incremental compilation may be fatally broken for this module **
+
+WARNING: Method definition #var(Any, typeof(Statistics.var), AbstractArray{C<:(ColorTypes.Color{T, 1} where T), N} where N) where {C<:(ColorTypes.Color{T, 1}[0m[91m where T)} in module Images overwritten in module Images.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition var(AbstractArray{C<:(ColorTypes.Colorant{T, N} where N where T), N}) where {C<:(ColorTypes.Colorant{T, N} where N where T), N} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:85 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:85.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition #var(Any, typeof(Statistics.var), AbstractArray{C<:(ColorTypes.Colorant{T, N} where N where T), N}) where {C<:(ColorTypes.Colorant{T, N} where N where T), N} in module Images overwritten in module Images.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition std(AbstractArray{C<:(ColorTypes.Colorant{T, N} where N where T), N} where N) where {C<:(ColorTypes.Colorant{T, N} where N where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:97 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:97.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition #std(Any, typeof(Statistics.std), AbstractArray{C<:(ColorTypes.Colorant{T, N} where N where T), N} where N) where {C<:(ColorTypes.Colorant{T, N} where N where T)} in module Images overwritten in module Images.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition red(AbstractArray{CV<:(ColorTypes.Color{T, N} where N where T), N} where N) where {CV<:(ColorTypes.Color{T, N} where N where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151.
+  ** incremental compilation may be fatally broken for this module **
+
+WARNING: Method definition [0m[91mred(AbstractArray{T, N} where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition green(AbstractArray{CV<:(ColorTypes.Color{T, N} where N where T), N} where N) where {CV<:(ColorTypes.Color{T, N} where N where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition green(AbstractArray{T, N} where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition blue(AbstractArray{CV<:(ColorTypes.Color{T, N} where N where T), N} where N) where {CV<:(ColorTypes.Color{T, N} where N where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition blue(AbstractArray{T, N} where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(AxisArrays.AxisArray{T, N, D, Ax} where Ax where D where N where T, Tuple{}) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:507 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:507.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T, Tuple{}) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:508 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:508.
+  ** incremental compilation may be fatally broken for this module **
+
+WARNING: Method definition restrict(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T, Tuple{Vararg{Int64, N}} where N) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:511 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:511.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(AxisArrays.AxisArray{T, N, D, Ax} where Ax where D, Tuple{Vararg{Int64, N}} where N) where {T, N} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:515 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:515.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(Union{AxisArrays.AxisArray{T, N, D, Ax} where Ax where D where N where T, ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AxisArrays.AxisArray{T, N, D, Ax} where Ax where D where N where T) where N where T}, Type{Ax}) where {Ax} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:524 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:524.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition dilate(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:654 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:654.
+  ** incremental compilation may be fatally broken for this module **
+
+WARNING: Method definition dilate(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T, Any) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:654 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:654.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition erode(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:655 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:655.
+  ** incremental compilation may be fatally broken for this module **
+
+WARNING: Method definition erode(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T, Any) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:655 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:655.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition hypot(ColorTypes.AbstractRGB{T} where T, ColorTypes.AbstractRGB{T} where T) in module Images at /opt/julia/packages/Images/BEHlD/src/edge.jl:60 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/edge.jl:60.
+  ** incremental compilation may be fatally broken for this module **
+
+[0mPrecompiling IJulia
+Precompiling Flux
+Precompiling DiffEqCallbacks
+Precompiling BlackBoxOptim
+Precompiling DifferentialEquations
+The command '/bin/sh -c julia -e "using Pkg; pkg\"precompile\""' returned a non-zero code: 137
