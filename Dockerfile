@@ -125,10 +125,18 @@ RUN chmod -R go+rx /opt/julia
 # Add a startup.jl to copy
 
 USER jupyter
-# Jupyterhub Stuff
+
+# Python extras 
+RUN conda install python-graphviz && \ 
+    pip install qeds fiona geopandas pyLDAvis gensim folium xgboost descartes pyarrow --upgrade
+
+
+# JupyterLab Extensions
 RUN conda install -c conda-forge nodejs && \ 
     jupyter labextension install @jupyterlab/toc  --no-build && \ 
     jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \ 
+    jupyter labextension install plotlywidget@1.1.1 --no-build && \ 
+    jupyter labextension install jupyterlab-plotly@1.1.2 --no-build && \ 
     jupyter lab build --dev-build=False && \ 
     npm cache clean --force
         
