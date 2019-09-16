@@ -127,9 +127,7 @@ RUN chmod -R go+rx /opt/julia
 USER jupyter
 # Jupyterhub Stuff
 RUN conda install -c conda-forge nodejs && \ 
-    pip install jupyterlab-quickopen && \ 
     jupyter labextension install @jupyterlab/toc  --no-build && \ 
-    jupyter labextension install @parente/jupyterlab-quickopen  --no-build && \ 
     jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build && \ 
     jupyter lab build --dev-build=False && \ 
     npm cache clean --force
