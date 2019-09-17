@@ -7,6 +7,6 @@ sudo docker rm $(sudo docker ps -aq)
 # Remove .julia directories 
 for d in /tank/home/*; do
   echo "cleaing $d"
-  sudo rm -rf d/.julia
+  cd $d && sudo rm -rf .julia
 done
 
