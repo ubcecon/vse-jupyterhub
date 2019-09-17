@@ -104,11 +104,12 @@ RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/b
 # grab github_project 
 RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
 # QuantEcon stuff
-RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); pkg\"add OffsetArrays DiffEqBase DiffEqCallbacks DiffEqJump DifferentialEquations StochasticDiffEq IteratorInterfaceExtensions DiffEqOperators\"; InstantiateFromURL.packages_to_default_environment()"
+RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); pkg\"activate \""
 # PackageCompiler 
-RUN julia -e "using Pkg; pkg\"add GR Plots StatsPlots DataFrames StatsPlots CSV PlotUtils GeometryTypes Tables PackageCompiler#sd-notomls CategoricalArrays IteratorInterfaceExtensions PooledArrays WeakRefStrings\""    
+RUN julia -e "using Pkg; pkg\"add PackageCompiler#sd-notomls\""
+RUN julia -e "using Pkg; pkg\"add GR Plots\""    
 RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests\"" 
-RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, :DataFrames, :CSV, :StatsPlots, install = true); cp(syso, sysold, force = true)" 
+RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, install = true); cp(syso, sysold, force = true)" 
 RUN julia -e "using Pkg; pkg\"precompile\""    
 # Jupyter user setup 
 RUN useradd -m -s /bin/bash -N -u 9999 jupyter
@@ -156,3 +157,4 @@ USER root
 RUN chown -R jupyter /home/jupyter/.julia
 RUN conda install -c conda-forge nbgitpuller
 USER jupyter
+RUN julia -e "using Pkg; pkg\"add OffsetArrays DiffEqBase DiffEqCallbacks DiffEqJump DifferentialEquations StochasticDiffEq IteratorInterfaceExtensions DiffEqOperators\""
