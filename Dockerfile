@@ -145,3 +145,4 @@ WORKDIR $HOME
 USER jupyter
 RUN julia -e "using Pkg; pkg\"add OffsetArrays DiffEqBase DiffEqCallbacks DiffEqJump DifferentialEquations StochasticDiffEq IteratorInterfaceExtensions DiffEqOperators\""
 RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); packages_to_default_environment()"
+RUN julia -e "using Pkg; pkg\"instantiate\""
