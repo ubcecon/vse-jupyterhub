@@ -35,7 +35,6 @@ RUN mkdir /etc/julia && \
     fix-permissions $JULIA_PKGDIR
 
 USER $NB_UID
-
 # R packages including IRKernel which gets installed globally.
 RUN conda install --quiet --yes \
     'r-base=3.6.1' \
@@ -79,6 +78,15 @@ RUN julia -e 'import Pkg; Pkg.update()' && \
     rm -rf $HOME/.local && \
     fix-permissions $JULIA_PKGDIR $CONDA_DIR/share/jupyter
 
+# Julia packages    
+RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
+# QuantEcon stuff
+RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); pkg\"activate \""
+# PackageCompiler 
+RUN julia -e "using Pkg; pkg\"add PackageCompiler#sd-notomls\""
+RUN julia -e "using Pkg; pkg\"add GR Plots\""    
+RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests GeometryTypes\"" 
+
 
 USER root
 RUN apt-get update && \
@@ -88,49 +96,30 @@ RUN apt-get update && \
     subversion \ 
     python-pandas
 
-#RUN conda install --quiet --yes \
-#    'r-base=3.4.1' \
-#    'r-irkernel=0.8*' \
-#    'julia=1.0*' && \
-#    conda clean -tipsy
-
+# Fix SageMath Kernel
 ENV CPATH=$CONDA_DIR/include
-
-# Fix SageMath kernel
-USER root
 RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
 
-# Fix Julia kernel  
-# grab github_project 
-RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
-# QuantEcon stuff
-RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); pkg\"activate \""
-# PackageCompiler 
-RUN julia -e "using Pkg; pkg\"add PackageCompiler#sd-notomls\""
-RUN julia -e "using Pkg; pkg\"add GR Plots\""    
-RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests\"" 
+# PackageCompiler step 
 RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, install = true); cp(syso, sysold, force = true)" 
-RUN julia -e "using Pkg; pkg\"precompile\""    
+RUN julia -e "using Pkg; pkg\"precompile\""
+RUN julia -e "using Pkg; pkg\"rm PackageCompiler\"; pkg\"gc\""    
+
 # Jupyter user setup 
 RUN useradd -m -s /bin/bash -N -u 9999 jupyter
 RUN chown -R jupyter /home/jupyter/
+RUN chown -R jupyter /opt/julia/
+RUN chown -R jupyter /opt/julia-1.2.0/
 RUN chown -R jupyter /home/jovyan/ && \ 
 chmod -R go+rx $CONDA_DIR/share/jupyter && \
 rm -rf $HOME/.local && \
 # Nuke the registry that came with Julia.
 rm -rf /opt/julia-1.2.0/local/share/julia/registries 
-# Nuke the registry that Jovyan uses.
-
-# Give the user read and execute permissions over /jovyan/.julia.
-RUN chmod -R go+rx /opt/julia
-# Add a startup.jl to copy
 
 USER jupyter
-
 # Python extras 
 RUN conda install python-graphviz && \ 
-    pip install qeds fiona geopandas pyLDAvis gensim folium xgboost descartes pyarrow --upgrade
-
+    pip install qeds fiona geopandas pyLDAvis gensim folium xgboost descartes pyarrow nbgitpuller --upgrade
 
 # JupyterLab Extensions
 RUN conda install -c conda-forge nodejs && \ 
@@ -146,15 +135,13 @@ ENV NB_USER=jupyter \
     NB_UID=9999
 ENV HOME=/home/$NB_USER
 
-# Configure the JULIA_DEPOT_PATH
+# Julia DEPOT fudging
 ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/opt/julia"
 ADD startup.jl /opt/julia-1.2.0/etc/julia/startup.jl    
 RUN julia /opt/julia-1.2.0/etc/julia/startup.jl
 ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
 HOME=/home/$NB_USER
 WORKDIR $HOME
-USER root
-RUN chown -R jupyter /home/jupyter/.julia
-RUN conda install -c conda-forge nbgitpuller
 USER jupyter
 RUN julia -e "using Pkg; pkg\"add OffsetArrays DiffEqBase DiffEqCallbacks DiffEqJump DifferentialEquations StochasticDiffEq IteratorInterfaceExtensions DiffEqOperators\""
+RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); packages_to_default_environment()"

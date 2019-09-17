@@ -6134,3 +6134,1030 @@ Step 26/46 : RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler
   [9fa8497b] + Future 
   [9abbd945] + Profile 
   [4607b0f0] + SuiteSparse 
+[91m┌ Warning: Snoop file errored. Precompile statements were recorded until error!
+│   exception =
+│    LoadError: ArgumentError: Package GeometryTypes not found in current path:
+│    - Run `import Pkg; Pkg.add("GeometryTypes")` to install the GeometryTypes package.
+│    
+│    in expression starting at /opt/julia/packages/Plots/h3o4c/test/runtests.jl:7
+└ @ Main /opt/julia/packages/PackageCompiler/bANkt/sysimg/run_julia_code.jl:6
+[0mSending build context to Docker daemon  815.6kB
+Step 1/46 : FROM jupyter/scipy-notebook:latest
+ ---> 844815ed865e
+Step 2/46 : ARG OPENBLAS_CORETYPE=HASWELL
+ ---> Using cache
+ ---> 2cf9f0a7594b
+Step 3/46 : ENV NB_USER=jovyan
+ ---> Using cache
+ ---> 6b818def7101
+Step 4/46 : ENV HOME=/home/$NB_USER
+ ---> Using cache
+ ---> ce9490016336
+Step 5/46 : USER root
+ ---> Using cache
+ ---> 530f3c4b3197
+Step 6/46 : RUN apt-get update &&     apt-get install -y --no-install-recommends     fonts-dejavu     gfortran     gcc &&     rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> d946813a1dbf
+Step 7/46 : ENV JULIA_DEPOT_PATH=/opt/julia
+ ---> Using cache
+ ---> cb07a1a6fb79
+Step 8/46 : ENV JULIA_PKGDIR=/opt/julia
+ ---> Using cache
+ ---> 135a60f969e7
+Step 9/46 : ENV JULIA_VERSION=1.2.0
+ ---> Using cache
+ ---> 9246ce9045de
+Step 10/46 : RUN mkdir /opt/julia-${JULIA_VERSION} &&     cd /tmp &&     wget -q https://julialang-s3.julialang.org/bin/linux/x64/`echo ${JULIA_VERSION} | cut -d. -f 1,2`/julia-${JULIA_VERSION}-linux-x86_64.tar.gz &&     echo "926ced5dec5d726ed0d2919e849ff084a320882fb67ab048385849f9483afc47 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - &&     tar xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia-${JULIA_VERSION} --strip-components=1 &&     rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
+ ---> Using cache
+ ---> 795e98add2ab
+Step 11/46 : RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
+ ---> Using cache
+ ---> ab358d9b8a90
+Step 12/46 : RUN mkdir /etc/julia &&     echo "push!(Libdl.DL_LOAD_PATH, \"$CONDA_DIR/lib\")" >> /etc/julia/juliarc.jl &&     mkdir $JULIA_PKGDIR &&     chown $NB_USER $JULIA_PKGDIR &&     fix-permissions $JULIA_PKGDIR
+ ---> Using cache
+ ---> ea10df746f86
+Step 13/46 : USER $NB_UID
+ ---> Using cache
+ ---> 6a5466823cd7
+Step 14/46 : RUN conda install --quiet --yes     'r-base=3.6.1'     'r-caret=6.0*'     'r-crayon=1.3*'     'r-devtools=2.1*'     'r-forecast=8.7*'     'r-hexbin=1.27*'     'r-htmltools=0.3*'     'r-htmlwidgets=1.3*'     'r-irkernel=1.0*'     'r-nycflights13=1.0*'     'r-plyr=1.8*'     'r-randomforest=4.6*'     'r-rcurl=1.95*'     'r-reshape2=1.4*'     'r-rmarkdown=1.14*'     'r-rsqlite=2.1*'     'r-shiny=1.3*'     'r-sparklyr=1.0*'     'r-tidyverse=1.2*'     'rpy2=2.9*'     &&     conda clean --all -f -y &&     fix-permissions $CONDA_DIR &&     fix-permissions /home/$NB_USER
+ ---> Using cache
+ ---> 1bd0faaa9e9d
+Step 15/46 : RUN julia -e 'import Pkg; Pkg.update()' &&     (test $TEST_ONLY_BUILD || julia -e 'import Pkg; Pkg.add("HDF5")') &&     julia -e "using Pkg; pkg\"add IJulia\"; pkg\"precompile\"" &&     mv $HOME/.local/share/jupyter/kernels/julia* $CONDA_DIR/share/jupyter/kernels/ &&     chmod -R go+rx $CONDA_DIR/share/jupyter &&     rm -rf $HOME/.local &&     fix-permissions $JULIA_PKGDIR $CONDA_DIR/share/jupyter
+ ---> Using cache
+ ---> c915a57539bc
+Step 16/46 : USER root
+ ---> Using cache
+ ---> 82ad7cf588af
+Step 17/46 : RUN apt-get update &&     apt-get install -y --no-install-recommends     sagemath     sagemath-jupyter     subversion     python-pandas
+ ---> Using cache
+ ---> f74bc35be5f8
+Step 18/46 : ENV CPATH=$CONDA_DIR/include
+ ---> Using cache
+ ---> 007bf090e7ce
+Step 19/46 : USER root
+ ---> Using cache
+ ---> 115edda5f859
+Step 20/46 : RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
+ ---> Using cache
+ ---> bc87f7613c25
+Step 21/46 : RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
+ ---> Using cache
+ ---> 993adf220932
+Step 22/46 : RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); pkg\"activate \""
+ ---> Using cache
+ ---> bc2de987959f
+Step 23/46 : RUN julia -e "using Pkg; pkg\"add PackageCompiler#sd-notomls\""
+ ---> Using cache
+ ---> 6ccc9d7eb5dc
+Step 24/46 : RUN julia -e "using Pkg; pkg\"add GR Plots\""
+ ---> Using cache
+ ---> bd3628f38769
+Step 25/46 : RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests GeometryTypes\""
+ ---> Running in 4600e4e7321b
+  Updating registry at `/opt/julia/registries/General`
+  Updating git-repo `https://github.com/JuliaRegistries/General.git`
+[?25l[2K[?25h Resolving package versions...
+ Installed RangeArrays ─────────────── v0.3.1
+ Installed DualNumbers ─────────────── v0.6.2
+ Installed CatIndices ──────────────── v0.2.0
+ Installed ComputationalResources ──── v0.3.0
+ Installed Unitful ─────────────────── v0.17.0
+ Installed Images ──────────────────── v0.18.0
+ Installed UnicodePlots ────────────── v1.1.0
+ Installed VisualRegressionTests ───── v0.3.1
+ Installed ImageMorphology ─────────── v0.2.4
+ Installed IdentityRanges ──────────── v0.3.0
+ Installed ImageDistances ──────────── v0.2.4
+ Installed Calculus ────────────────── v0.5.0
+ Installed ImageShow ───────────────── v0.2.0
+ Installed CoordinateTransformations ─ v0.5.0
+ Installed MappedArrays ────────────── v0.2.1
+ Installed QuartzImageIO ───────────── v0.6.0
+ Installed ImageAxes ───────────────── v0.6.1
+ Installed ColorVectorSpace ────────── v0.7.1
+ Installed ImageMetadata ───────────── v0.7.2
+ Installed CustomUnitRanges ────────── v0.2.0
+ Installed ImageTransformations ────── v0.8.0
+ Installed Graphics ────────────────── v0.4.0
+ Installed ImageFiltering ──────────── v0.6.5
+ Installed PaddedViews ─────────────── v0.4.2
+ Installed ImageCore ───────────────── v0.8.5
+ Installed TiledIteration ──────────── v0.2.3
+ Installed IntervalSets ────────────── v0.3.2
+ Installed FFTW ────────────────────── v1.0.0
+ Installed IndirectArrays ──────────── v0.5.0
+ Installed FFTViews ────────────────── v0.3.0
+ Installed AxisArrays ──────────────── v0.3.3
+ Installed SpecialFunctions ────────── v0.8.0
+ Installed Rotations ───────────────── v0.12.0
+ Installed ImageMagick ─────────────── v0.7.5
+  Updating `/opt/julia/environments/v1.2/Project.toml`
+  [34da2185] + Compat v2.1.0
+  [e7dc6d0d] + DataValues v0.4.12
+  [fa6b7ba4] + DualNumbers v0.6.2
+  [4d00f742] + GeometryTypes v0.7.6
+  [916415d5] + Images v0.18.0
+  [42fd0dbc] + IterativeSolvers v0.8.1
+  [b964fa9f] + LaTeXStrings v1.0.3
+  [b8865327] + UnicodePlots v1.1.0
+  [1986cc42] + Unitful v0.17.0
+  [34922c18] + VisualRegressionTests v0.3.1
+  Updating `/opt/julia/environments/v1.2/Manifest.toml`
+  [621f4979] + AbstractFFTs v0.4.1
+  [13072b0f] + AxisAlgorithms v1.0.0
+  [39de3d68] + AxisArrays v0.3.3
+  [00ebfdb7] + CSTParser v0.6.2
+  [49dc2e85] + Calculus v0.5.0
+  [aafaddc9] + CatIndices v0.2.0
+  [c3611d14] + ColorVectorSpace v0.7.1
+  [ed09eef8] + ComputationalResources v0.3.0
+  [150eb455] + CoordinateTransformations v0.5.0
+  [dc8bdbbb] + CustomUnitRanges v0.2.0
+  [e2d170a0] + DataValueInterfaces v1.0.0
+  [e7dc6d0d] + DataValues v0.4.12
+  [b4f34e82] + Distances v0.8.2
+  [fa6b7ba4] + DualNumbers v0.6.2
+  [4f61f5a4] + FFTViews v0.3.0
+  [7a1cc6ca] + FFTW v1.0.0
+  [5789e2e9] + FileIO v1.0.7
+  [a2bd30eb] + Graphics v0.4.0
+  [bbac6d45] + IdentityRanges v0.3.0
+  [2803e5a7] + ImageAxes v0.6.1
+  [a09fc81d] + ImageCore v0.8.5
+  [51556ac3] + ImageDistances v0.2.4
+  [6a3955dd] + ImageFiltering v0.6.5
+  [6218d12a] + ImageMagick v0.7.5
+  [bc367c6b] + ImageMetadata v0.7.2
+  [787d08f9] + ImageMorphology v0.2.4
+  [4e3cecfd] + ImageShow v0.2.0
+  [02fcd773] + ImageTransformations v0.8.0
+  [916415d5] + Images v0.18.0
+  [9b13fd28] + IndirectArrays v0.5.0
+  [a98d9a8b] + Interpolations v0.12.2
+  [8197267c] + IntervalSets v0.3.2
+  [42fd0dbc] + IterativeSolvers v0.8.1
+  [b964fa9f] + LaTeXStrings v1.0.3
+  [1914dd2f] + MacroTools v0.5.1
+  [dbb5928d] + MappedArrays v0.2.1
+  [6fe1bfb0] + OffsetArrays v0.11.1
+  [5432bcbf] + PaddedViews v0.4.2
+  [dca85d43] + QuartzImageIO v0.6.0
+  [b3c3ace0] + RangeArrays v0.3.1
+  [c84ed2f1] + Ratios v0.3.1
+  [6038ab10] + Rotations v0.12.0
+  [699a6c99] + SimpleTraits v0.9.0
+  [276daf66] + SpecialFunctions v0.8.0
+  [06e1c1a7] + TiledIteration v0.2.3
+  [0796e94c] + Tokenize v0.5.6
+  [b8865327] + UnicodePlots v1.1.0
+  [1986cc42] + Unitful v0.17.0
+  [34922c18] + VisualRegressionTests v0.3.1
+  [efce3f68] + WoodburyMatrices v0.4.1
+  Building FFTW ────────────→ `/opt/julia/packages/FFTW/xi4tZ/deps/build.log`
+  Building SpecialFunctions → `/opt/julia/packages/SpecialFunctions/ne2iw/deps/build.log`
+  Building ImageMagick ─────→ `/opt/julia/packages/ImageMagick/vMfoS/deps/build.log`
+Removing intermediate container 4600e4e7321b
+ ---> 2b9c1663c41d
+Step 26/46 : RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, install = true); cp(syso, sysold, force = true)"
+ ---> Running in e3309c796f2b
+  Updating registry at `/opt/julia/registries/General`
+  Updating git-repo `https://github.com/JuliaRegistries/General.git`
+[?25l[2K[?25h Resolving package versions...
+ Installed PDMats ──────────── v0.9.10
+ Installed FillArrays ──────── v0.7.0
+ Installed DiffEqDiffTools ─── v1.3.0
+ Installed QuadGK ──────────── v2.0.3
+ Installed CategoricalArrays ─ v0.6.0
+ Installed DataFrames ──────── v0.19.4
+ Installed Optim ───────────── v0.19.3
+ Installed Distributions ───── v0.21.1
+  Updating `/opt/julia/environments/v1.2/Project.toml`
+  [b99e7846] + BinaryProvider v0.5.6
+  [5789e2e9] + FileIO v1.0.7
+  [6218d12a] + ImageMagick v0.7.5
+  [ce6b1742] + RDatasets v0.6.3
+  [f3b207a7] + StatsPlots v0.12.0
+  [44cfe95a] + Pkg 
+  [9a3f8284] + Random 
+  [8dfed614] + Test 
+  Updating `/opt/julia/environments/v1.2/Manifest.toml`
+  [7d9fca2a] + Arpack v0.3.1
+  [4fba245c] + ArrayInterface v1.2.1
+  [336ed68f] + CSV v0.5.12
+  [324d7699] + CategoricalArrays v0.6.0
+  [aaaa29a8] + Clustering v0.13.3
+  [944b1d66] + CodecZlib v0.5.2
+  [bbf7d656] + CommonSubexpressions v0.2.0
+  [a93c6f00] + DataFrames v0.19.4
+  [01453d9d] + DiffEqDiffTools v1.3.0
+  [163ba53b] + DiffResults v0.0.4
+  [b552c78f] + DiffRules v0.0.10
+  [31c24e10] + Distributions v0.21.1
+  [8f5d6c58] + EzXML v0.9.4
+  [7a1cc6ca] ↓ FFTW v1.0.0 ⇒ v0.3.0
+  [1a297f60] + FillArrays v0.7.0
+  [f6369f11] + ForwardDiff v0.10.3
+  [41ab1584] + InvertedIndices v1.0.0
+  [82899510] + IteratorInterfaceExtensions v1.0.0
+  [5ab0869b] + KernelDensity v0.5.1
+  [d3d80556] + LineSearches v7.0.1
+  [78c3b35d] + Mocking v0.7.0
+  [d41bc354] + NLSolversBase v7.4.1
+  [b8a86587] + NearestNeighbors v0.4.3
+  [510215fc] + Observables v0.2.3
+  [429524aa] + Optim v0.19.3
+  [90014a1f] + PDMats v0.9.10
+  [2dfb63ee] + PooledArrays v0.5.2
+  [85a6dd25] + PositiveFactorizations v0.2.2
+  [1fd47b50] + QuadGK v2.0.3
+  [df47a6cb] + RData v0.6.2
+  [ce6b1742] + RDatasets v0.6.3
+  [79098fc4] + Rmath v0.5.0
+  [276daf66] ↓ SpecialFunctions v0.8.0 ⇒ v0.7.2
+  [4c63d2b9] + StatsFuns v0.8.0
+  [f3b207a7] + StatsPlots v0.12.0
+  [3783bdb8] + TableTraits v1.0.0
+  [bd369af6] + Tables v0.2.11
+  [f269a46b] + TimeZones v0.10.0
+  [3bb67fe8] + TranscodingStreams v0.9.5
+  [ea10d353] + WeakRefStrings v0.6.1
+  [cc8bc4a8] + Widgets v0.6.2
+  [9fa8497b] + Future 
+  [9abbd945] + Profile 
+  [4607b0f0] + SuiteSparse 
+[91m[ Info: downloading reference images for version 0.0.1
+[0m[91m[ Info: Testing plot: gr:1:Lines
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref1.png matches.  Difference: 0.00139729602360031
+[0m[91m[ Info: Testing plot: gr:2:Functions, adding data, and animations
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref2.png matches.  Difference: 0.0011927570038920148
+[0m[91m[ Info: Testing plot: gr:3:Parametric plots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref3.png matches.  Difference: 0.0015872159344506094
+[0m[91m[ Info: Testing plot: gr:4:Colors
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref4.png matches.  Difference: 0.005260198637048354
+[0m[91m[ Info: Testing plot: gr:5:Global
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref5.png matches.  Difference: 0.005034736845084589
+[0m[91m[ Info: Testing plot: gr:6:Images
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref6.png matches.  Difference: 0.0019512053026279693
+[0m[91m[ Info: Testing plot: gr:7:Arguments
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref7.png matches.  Difference: 0.0012614239724851905
+[0m[91m[ Info: Testing plot: gr:8:Build plot in pieces
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref8.png matches.  Difference: 0.0011679319936617296
+[0m[91m[ Info: Testing plot: gr:9:
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref9.png matches.  Difference: 0.001366088278159216
+[0m[91m[ Info: Testing plot: gr:10:Histogram2D
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref10.png matches.  Difference: 0.001964209998839973
+[0m[91m[ Info: Testing plot: gr:11:Line types
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref11.png matches.  Difference: 0.0033600661126396594
+[0m[91m[ Info: Testing plot: gr:12:Line styles
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref12.png matches.  Difference: 0.0037642594771708877
+[0m[91m[ Info: Testing plot: gr:13:Marker types
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref13.png matches.  Difference: 0.0069868261611694925
+[0m[91m[ Info: Testing plot: gr:14:Bar
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref14.png matches.  Difference: 0.0012299164170406882
+[0m[91m[ Info: Testing plot: gr:15:Histogram
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref15.png matches.  Difference: 0.0012788060335922865
+[0m[91m[ Info: Testing plot: gr:16:Subplots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref16.png matches.  Difference: 0.0
+[0m[91m[ Info: Testing plot: gr:17:Adding to subplots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref17.png matches.  Difference: 0.0053796243827973576
+[0m[91m[ Info: Testing plot: gr:18:
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref18.png matches.  Difference: 0.008208893022677285
+[0m[91m[ Info: Testing plot: gr:19:Open/High/Low/Close
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref19.png matches.  Difference: 0.0010991193590176916
+[0m[91m[ Info: Testing plot: gr:20:Annotations
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref20.png matches.  Difference: 0.014843101548767276
+[0m[91m[ Info: Testing plot: gr:21:Custom Markers
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref21.png matches.  Difference: 0.0016085063219953544
+[0m[91m[ Info: Testing plot: gr:22:Contours
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref22.png matches.  Difference: 0.003951127144072755
+[0m[91m[ Info: Testing plot: gr:23:Pie
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.17.2/ref23.png matches.  Difference: 0.030755941108560995
+[0m[91m[ Info: Testing plot: gr:24:3D
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref24.png matches.  Difference: 0.0016401263130674895
+[0m[91m[ Info: Testing plot: gr:26:Groups and Subplots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref26.png matches.  Difference: 0.005274520469725564
+[0m[91m[ Info: Testing plot: gr:27:Polar Plots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref27.png matches.  Difference: 0.0027817768464056614
+[0m[91m[ Info: Testing plot: gr:28:Heatmap, categorical axes, and aspect_ratio
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref28.png matches.  Difference: 0.019815565267414157
+[0m[91m[ Info: Testing plot: gr:29:Layouts, margins, label rotation, title location
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref29.png matches.  Difference: 0.0072668091491655705
+[0m[91m[ Info: Testing plot: gr:31:Animation with subplots
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref31.png matches.  Difference: 0.004480312234982209
+[0m[91m[ Info: Testing plot: gr:32:Spy
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref32.png matches.  Difference: 0.014372653917299683
+[0m[91m[ Info: Testing plot: gr:33:Magic grid argument
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref33.png matches.  Difference: 0.01200926200175385
+[0m[91m[ Info: Testing plot: gr:34:Framestyle
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref34.png matches.  Difference: 0.009531077218071372
+[0m[91m[ Info: Testing plot: gr:35:Lines and markers with varying colors
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref35.png matches.  Difference: 0.0034885501154748298
+[ Info: Testing plot: gr:36:Portfolio Composition maps
+[0m[91m[ Info: Reference image /opt/julia/packages/Plots/h3o4c/test/reference_images/PlotReferenceImages.jl-0.0.1/Plots/gr/0.25.0/ref36.png matches.  Difference: 0.0034041579034496928
+[0mTest Summary: | Pass  Total
+GR            |   36     36
+                      ┌──────────────────────────────────────────────────┐   
+   0.8737534070424064 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠤⢲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡤⠒⠉⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⢀⠴⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡰⠁⠀⠀⠀⠀⠀⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⢠⠊⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⠀⠀⡔⠁⠀⠀⠀⠈⢆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⢀⠎⠀⠀⠀⠀⠀⠀⠈⢢⠀⠀⠀⠀⠀⠀⠀⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      │⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⡀⠀⠀⠀⠀⠀⢰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⣀⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢱⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⢀⡠⠢⢄⣀⠀⠀⢀⠇⠀⠀⠀⠀⠀│   
+                      │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⣀⠔⠁⠀⠀⠀⠀⠉⠒⠜⠀⠀⠀⠀⠀⠀│   
+   0.1809792182704848 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                      └──────────────────────────────────────────────────┘   
+                      0.73                                           10.27                       ┌──────────────────────────────────────────────────┐   
+     1.953469330177843 │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣖⠒⠒⠒⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⣿⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⡇⡇⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⡇⢱⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀⡇⠘⡄⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀⡇⠀⢇⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⠀⠀⠀⡇⠀⢸⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣤⠤⠤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣰⠥⠤⠤⡄⡇⠀⠀⡇⡇⠀⠀⠀⠀⣀⣀⣀⣀⡀⠀⠀⢀⠎⢸⠀⠉⠢⣇⣀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀│   
+                       │⡏⠉⢹⠉⠉⠉⡯⠛⠛⠛⠛⠉⠉⠉⠉⠉⠉⠉⠉⢹⢹⠉⠉⠉⣽⠉⠙⠫⣉⢹⢉⠝⠉⢹⠉⠉⠉⠉⠉⢫⠉⠉⠉⢹⠉⠉⠉⡏⠉⠉│   
+                       │⡇⠀⢸⠀⡠⠊⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣼⠀⢀⠎⢸⠀⠀⠀⠀⠙⠓⠒⠒⠚⠀⠀⠀⠀⠀⠈⡆⠀⠀⢸⠀⠀⠀⡇⠀⠀│   
+                       │⡇⠀⠸⠮⠤⠤⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢿⢀⠎⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡀⠀⢸⠀⠀⠀⡇⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⠧⠤⠤⠼⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢣⠀⢸⠀⠀⠀⡇⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡆⢸⠀⠀⠀⡇⠀⠀│   
+                       │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣼⠀⠀⠀⡇⠀⠀│   
+   -1.6041158298033489 │⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹⠤⠤⠤⠇⠀⠀│   
+                       └──────────────────────────────────────────────────┘   
+                       -0.005640000000000034             11.005640000000001Test Summary: | Pass  Total
+UnicodePlots  |    6      6
+Test Summary: | Pass  Total
+Axes          |    6      6
+         ┌──────────────────────────────────────────────────┐   
+    5.15 │⠀⠀⢸⢖⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⠒⢲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+         │⠀⠀⢸⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⡀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⡀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⡀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠢⡀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢺⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⡄⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀│   
+         │⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀│   
+   -0.15 │⠤⠤⢼⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠼⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠧⠤⠤│   
+         └──────────────────────────────────────────────────┘   
+         -0.1236                                       2.1236         ┌──────────────────────────────────────────────────┐   
+    1.03 │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+         │⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   -0.03 │⠤⡧⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤│   
+         └──────────────────────────────────────────────────┘   
+         -0.03                                           1.03        ┌──────────────────────────────────────────────────┐   
+   4.09 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠄⠀│ y1
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠊⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠤⠊⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠚⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠒⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠒⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   0.91 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        └──────────────────────────────────────────────────┘   
+        0.88                                            5.12        ┌──────────────────────────────────────────────────┐   
+   4.09 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⠀│ y1
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡰⠁⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠃⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡸⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠁⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   0.91 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠰⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        └──────────────────────────────────────────────────┘   
+        0.61                                           14.39        ┌──────────────────────────────────────────────────┐   
+   2.03 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y1
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ y2
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   0.97 │⠀⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠄⠀│   
+        └──────────────────────────────────────────────────┘   
+        0.97                                            2.03        ┌──────────────────────────────────────────────────┐   
+   4.09 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠄⠀│ y1
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠃⠀⠀│ y2
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠃⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⠀⠀⢀⠎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⠀⢀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⠀⠀⡠⠊⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        │⠀⠀⢀⠎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+   0.91 │⠀⠔⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│   
+        └──────────────────────────────────────────────────┘   
+        0.41000000000000003                             3.59Test Summary: |
+NoFail        | No tests
+Test Summary: | Pass  Total
+EmptyAnim     |    1      1
+Test Summary: | Pass  Total
+Segments      |    8      8
+Test Summary: | Pass  Total
+Utils         |   20     20
+Build shared library "/opt/julia/packages/PackageCompiler/bANkt/sysimg/sys.so":
+  `cc -shared '-DJULIAC_PROGRAM_LIBNAME="/opt/julia/packages/PackageCompiler/bANkt/sysimg/sys.so"' -o /opt/julia/packages/PackageCompiler/bANkt/sysimg/sys.so -Wl,--whole-archive /opt/julia/packages/PackageCompiler/bANkt/sysimg/sys.a -Wl,--no-whole-archive -std=gnu99 -I/opt/julia-1.2.0/include/julia -DJULIA_ENABLE_THREADING=1 -fPIC -L/opt/julia-1.2.0/lib -Wl,--export-dynamic -Wl,-rpath,/opt/julia-1.2.0/lib -Wl,-rpath,/opt/julia-1.2.0/lib/julia -ljulia -m64 -O3`
+Removing intermediate container e3309c796f2b
+ ---> 214db902bc4a
+Step 27/46 : RUN julia -e "using Pkg; pkg\"precompile\""
+ ---> Running in 3ac71ec4d433
+Precompiling project...
+Precompiling StatsPlots
+[91m┌ Warning: Replacing module `StatsPlots`
+└ @ Base loading.jl:931
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, KernelDensity.UnivariateKDE{R} where R<:(Base.AbstractRange{T} where T)) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, KernelDensity.BivariateKDE{Rx, Ry} where Ry<:(Base.AbstractRange{T} where T) where Rx<:(Base.AbstractRange{T} where T)) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition recipetype(Base.Val{:corrplot}, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/corrplot.jl:3 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/corrplot.jl:3.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition recipetype(Base.Val{:cornerplot}, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/cornerplot.jl:3 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/cornerplot.jl:3.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Distributions.Distribution{F, S} where S<:Distributions.ValueSupport where F<:Distributions.VariateForm) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Distributions.MixtureModel{VF, VS, C, CT} where CT<:Real where C<:(Distributions.Distribution{F, S} where S<:Distributions.ValueSupport where F<:Distributions.VariateForm) where VS<:Distributions.ValueSupport where VF<:Distributions.VariateForm) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, AbstractArray{#s40, N} where N where #s40<:(Distributions.Distribution{F, S} where S<:Distributions.ValueSupport where F<:Distributions.VariateForm), Any...) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{T<:(Distributions.Distribution{F, S} where S<:Distributions.ValueSupport where F<:Distributions.VariateForm)}, T<:(Distributions.Distribution{F, S} where S<:Distributions.ValueSupport where F<:Distributions.VariateForm)) where {T<:(Distributions.Distribution{F, S} where S<:Distributions.ValueSupport where F<:Distributions.VariateForm)} in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Distributions.QQPair) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition recipetype(Base.Val{:qqplot}, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/distributions.jl:97 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/distributions.jl:97.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition recipetype(Base.Val{:qqnorm}, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/distributions.jl:101 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/distributions.jl:101.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:boxplot}}, Any, Any, Any) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition recipetype(Base.Val{:groupedboxplot}, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/boxplot.jl:128 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/boxplot.jl:128.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:dotplot}}, Any, Any, Any) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition recipetype(Base.Val{:groupeddotplot}, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/dotplot.jl:81 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/dotplot.jl:81.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:violin}}, Any, Any, Any) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition recipetype(Base.Val{:groupedviolin}, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/violin.jl:156 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/violin.jl:156.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:density}}, Any, Any, Any) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:cdensity}}, Any, Any, Any) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:ea_histogram}}, Any, Any, Any) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:testhist}}, Any, Any, Any) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition wand_edges(AbstractArray{T, 1} where T, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/hist.jl:68 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/hist.jl:68.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:marginalhist}}, RecipesBase.AbstractPlot{T} where T<:RecipesBase.AbstractBackend) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition recipetype(Base.Val{:groupedbar}, Any...) in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/bar.jl:3 overwritten in module StatsPlots at /opt/julia/packages/StatsPlots/Y1rGZ/src/bar.jl:3.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Clustering.Hclust{T} where T<:Real) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition apply_recipe(Base.Dict{Symbol, Any}, Type{Base.Val{:andrews}}, Any, Any, Any) in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269 overwritten in module StatsPlots at /opt/julia/packages/RecipesBase/zBoFG/src/RecipesBase.jl:269.
+  ** incremental compilation may be fatally broken for this module **
+
+[0mPrecompiling DualNumbers
+Precompiling IJulia
+Precompiling Images
+[91m┌ Warning: Replacing module `Images`
+└ @ Base loading.jl:931
+[0m[91mWARNING: Method definition var(AbstractArray{C<:(ColorTypes.Color{T, 1} where T), N} where N) where {C<:(ColorTypes.Color{T, 1} where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:80 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:80.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition #var(Any, typeof(Statistics.var), AbstractArray{C<:(ColorTypes.Color{T, 1} where T), N} where N) where {C<:(ColorTypes.Color{T, 1} where T)} in module Images overwritten in module Images.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition var(AbstractArray{C<:(ColorTypes.Colorant{T, N} where N where T), N}) where {C<:(ColorTypes.Colorant{T, N} where N where T), N} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:85 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:85.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition #var(Any, typeof(Statistics.var), AbstractArray{C<:(ColorTypes.Colorant{T, N} where N where T), N}) where {C<:(ColorTypes.Colorant{T, N} where N where T), N} in module Images overwritten in module Images.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition std(AbstractArray{C<:(ColorTypes.Colorant{T, N} where N where T), N} where N) where {C<:(ColorTypes.Colorant{T, N} where N where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:97 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:97.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition #std(Any, typeof(Statistics.std), AbstractArray{C<:(ColorTypes.Colorant{T, N} where N where T), N} where N) where {C<:(ColorTypes.Colorant{T, N} where N where T)} in module Images overwritten in module Images.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition red(AbstractArray{CV<:(ColorTypes.Color{T, N} where N where T), N} where N) where {CV<:(ColorTypes.Color{T, N} where N where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition red(AbstractArray{T, N} where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition green(AbstractArray{CV<:(ColorTypes.Color{T, N} where N where T), N} where N) where {CV<:(ColorTypes.Color{T, N} where N where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition green(AbstractArray{T, N} where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition blue(AbstractArray{CV<:(ColorTypes.Color{T, N} where N where T), N} where N) where {CV<:(ColorTypes.Color{T, N} where N where T)} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:151.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition blue(AbstractArray{T, N} where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:160.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(AxisArrays.AxisArray{T, N, D, Ax} where Ax where D where N where T, Tuple{}) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:507 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:507.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T, Tuple{}) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:508 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:508.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T, Tuple{Vararg{Int64, N}} where N) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:511 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:511.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(AxisArrays.AxisArray{T, N, D, Ax} where Ax where D, Tuple{Vararg{Int64, N}} where N) where {T, N} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:515 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:515.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition restrict(Union{AxisArrays.AxisArray{T, N, D, Ax} where Ax where D where N where T, ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AxisArrays.AxisArray{T, N, D, Ax} where Ax where D where N where T) where N where T}, Type{Ax}) where {Ax} in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:524 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:524.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition dilate(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:654 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:654.
+  ** incremental compilation may be fatally broken for this module **
+
+WARNING: Method definition dilate(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T, Any) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:654 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:654.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition erode(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:655 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:655.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition erode(ImageMetadata.ImageMeta{T, N, A, P} where P<:Base.AbstractDict{String, Any} where A<:(AbstractArray{T, N} where N where T) where N where T, Any) in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:655 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/algorithms.jl:655.
+  ** incremental compilation may be fatally broken for this module **
+
+[0m[91mWARNING: Method definition hypot(ColorTypes.AbstractRGB{T} where T, ColorTypes.AbstractRGB{T} where T) in module Images at /opt/julia/packages/Images/BEHlD/src/edge.jl:60 overwritten in module Images at /opt/julia/packages/Images/BEHlD/src/edge.jl:60.
+  ** incremental compilation may be fatally broken for this module **
+
+[0mPrecompiling RDatasets
+[91m┌ Warning: Replacing module `RDatasets`
+└ @ Base loading.jl:931
+[0mPrecompiling Unitful
+Removing intermediate container 3ac71ec4d433
+ ---> 533d1aa69316
+Step 28/46 : RUN useradd -m -s /bin/bash -N -u 9999 jupyter
+ ---> Running in 9427847e8486
+Removing intermediate container 9427847e8486
+ ---> 5a7ba7c47152
+Step 29/46 : RUN chown -R jupyter /home/jupyter/
+ ---> Running in aa8543b663b0
+Removing intermediate container aa8543b663b0
+ ---> b28ac6805ed1
+Step 30/46 : RUN chown -R jupyter /home/jovyan/ && chmod -R go+rx $CONDA_DIR/share/jupyter && rm -rf $HOME/.local && rm -rf /opt/julia-1.2.0/local/share/julia/registries
+ ---> Running in 585aa420eee2
+Removing intermediate container 585aa420eee2
+ ---> f9a2fe11be42
+Step 31/46 : RUN chmod -R go+rx /opt/julia
+ ---> Running in 72bd9069e8e1
+Removing intermediate container 72bd9069e8e1
+ ---> aa0573e8fade
+Step 32/46 : USER jupyter
+ ---> Running in 5d0eaafde8b1
+Removing intermediate container 5d0eaafde8b1
+ ---> 8e7fe0a6cd84
+Step 33/46 : RUN conda install python-graphviz &&     pip install qeds fiona geopandas pyLDAvis gensim folium xgboost descartes pyarrow --upgrade
+ ---> Running in 1bef1c8201a2
+Collecting package metadata (current_repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /opt/conda
+
+  added / updated specs:
+    - python-graphviz
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    expat-2.2.5                |    he1b5a44_1003         191 KB  conda-forge
+    graphviz-2.40.1            |       h0f2764d_1         6.4 MB  conda-forge
+    libtool-2.4.6              |    h14c3975_1002         512 KB  conda-forge
+    python-graphviz-0.13       |             py_0          18 KB  conda-forge
+    xorg-libxpm-3.5.12         |    h516909a_1002          63 KB  conda-forge
+    xorg-libxt-1.1.5           |    h516909a_1003         367 KB  conda-forge
+    ------------------------------------------------------------
+                                           Total:         7.6 MB
+
+The following NEW packages will be INSTALLED:
+
+  expat              conda-forge/linux-64::expat-2.2.5-he1b5a44_1003
+  graphviz           conda-forge/linux-64::graphviz-2.40.1-h0f2764d_1
+  libtool            conda-forge/linux-64::libtool-2.4.6-h14c3975_1002
+  python-graphviz    conda-forge/noarch::python-graphviz-0.13-py_0
+  xorg-libxpm        conda-forge/linux-64::xorg-libxpm-3.5.12-h516909a_1002
+  xorg-libxt         conda-forge/linux-64::xorg-libxt-1.1.5-h516909a_1003
+
+
+Proceed ([y]/n)? 
+
+Downloading and Extracting Packages
+python-graphviz-0.13 | 18 KB     |            |   0% python-graphviz-0.13 | 18 KB     | ########## | 100% 
+expat-2.2.5          | 191 KB    |            |   0% expat-2.2.5          | 191 KB    | ########## | 100% 
+xorg-libxpm-3.5.12   | 63 KB     |            |   0% xorg-libxpm-3.5.12   | 63 KB     | ########## | 100% 
+libtool-2.4.6        | 512 KB    |            |   0% libtool-2.4.6        | 512 KB    | ########## | 100% 
+graphviz-2.40.1      | 6.4 MB    |            |   0% graphviz-2.40.1      | 6.4 MB    | ###6       |  37% graphviz-2.40.1      | 6.4 MB    | ########## | 100% 
+xorg-libxt-1.1.5     | 367 KB    |            |   0% xorg-libxt-1.1.5     | 367 KB    | ########## | 100% 
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+[91m
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.7.10
+  latest version: 4.7.12
+
+Please update conda by running
+
+    $ conda update -n base conda
+
+
+[0mCollecting qeds
+  Downloading https://files.pythonhosted.org/packages/c6/c1/658d66503955241a9c9d94322ee351d6c1a630188988e0c3fc19db9dc0cd/qeds-0.5.2.tar.gz
+Collecting fiona
+  Downloading https://files.pythonhosted.org/packages/1b/01/1ff66b7ffc6b9b0abb9505a0fc169208e25adcce9bd5f37e0756a93ab5f4/Fiona-1.8.6-cp37-cp37m-manylinux1_x86_64.whl (17.9MB)
+Collecting geopandas
+  Downloading https://files.pythonhosted.org/packages/21/80/da2a33c9201cd4ce693f4aa6189efc9ef1a48bec1c3b02c3ce9908b07fec/geopandas-0.5.1-py2.py3-none-any.whl (893kB)
+Collecting pyLDAvis
+  Downloading https://files.pythonhosted.org/packages/a5/3a/af82e070a8a96e13217c8f362f9a73e82d61ac8fff3a2561946a97f96266/pyLDAvis-2.1.2.tar.gz (1.6MB)
+Collecting gensim
+  Downloading https://files.pythonhosted.org/packages/2d/5d/b89bb0734a7d0c7543f9d78fa56769e46dd68b3063990181e45806584cdf/gensim-3.8.0-cp37-cp37m-manylinux1_x86_64.whl (24.2MB)
+Collecting folium
+  Downloading https://files.pythonhosted.org/packages/72/ff/004bfe344150a064e558cb2aedeaa02ecbf75e60e148a55a9198f0c41765/folium-0.10.0-py2.py3-none-any.whl (91kB)
+Collecting xgboost
+  Downloading https://files.pythonhosted.org/packages/c1/24/5fe7237b2eca13ee0cfb100bec8c23f4e69ce9df852a64b0493d49dae4e0/xgboost-0.90-py2.py3-none-manylinux1_x86_64.whl (142.8MB)
+Collecting descartes
+  Downloading https://files.pythonhosted.org/packages/e5/b6/1ed2eb03989ae574584664985367ba70cd9cf8b32ee8cad0e8aaeac819f3/descartes-1.1.0-py3-none-any.whl
+Collecting pyarrow
+  Downloading https://files.pythonhosted.org/packages/1a/ef/65cc820e4563c946592cb3d38f33bc342160943231ffae8a9550460f9bb7/pyarrow-0.14.1-cp37-cp37m-manylinux2010_x86_64.whl (58.1MB)
+Requirement already satisfied, skipping upgrade: pandas in /opt/conda/lib/python3.7/site-packages (from qeds) (0.25.0)
+Requirement already satisfied, skipping upgrade: requests in /opt/conda/lib/python3.7/site-packages (from qeds) (2.22.0)
+Collecting quandl (from qeds)
+  Downloading https://files.pythonhosted.org/packages/12/64/6314547cb01fa75697ddba6d6d43a9f1d023c1730ffc6abf3db7a0c89222/Quandl-3.4.8-py2.py3-none-any.whl
+Requirement already satisfied, skipping upgrade: scipy in /opt/conda/lib/python3.7/site-packages (from qeds) (1.3.1)
+Requirement already satisfied, skipping upgrade: numpy in /opt/conda/lib/python3.7/site-packages (from qeds) (1.17.0)
+Collecting quantecon (from qeds)
+  Downloading https://files.pythonhosted.org/packages/a7/2a/a3b740e670011a063a445dfcb2c30801238c4e70a75f89d8eb7d846bb125/quantecon-0.4.5.tar.gz (138kB)
+Requirement already satisfied, skipping upgrade: matplotlib in /opt/conda/lib/python3.7/site-packages (from qeds) (3.1.1)
+Collecting openpyxl (from qeds)
+  Downloading https://files.pythonhosted.org/packages/f5/39/942a406621c1ff0de38d7e4782991b1bac046415bf54a66655c959ee66e8/openpyxl-2.6.3.tar.gz (173kB)
+Collecting plotly (from qeds)
+  Downloading https://files.pythonhosted.org/packages/70/19/8437e22c84083a6d5d8a3c80f4edc73c9dcbb89261d07e6bd13b48752bbd/plotly-4.1.1-py2.py3-none-any.whl (7.1MB)
+Collecting pandas_datareader (from qeds)
+  Downloading https://files.pythonhosted.org/packages/d1/db/c6c72242179251ed9ead7af852296ae9558b1d0cfd972eef6c3398b131d1/pandas_datareader-0.7.4-py2.py3-none-any.whl (113kB)
+Requirement already satisfied, skipping upgrade: scikit-learn in /opt/conda/lib/python3.7/site-packages (from qeds) (0.21.3)
+Requirement already satisfied, skipping upgrade: seaborn in /opt/conda/lib/python3.7/site-packages (from qeds) (0.9.0)
+Requirement already satisfied, skipping upgrade: statsmodels in /opt/conda/lib/python3.7/site-packages (from qeds) (0.10.1)
+Collecting click-plugins>=1.0 (from fiona)
+  Downloading https://files.pythonhosted.org/packages/e9/da/824b92d9942f4e472702488857914bdd50f73021efea15b4cad9aca8ecef/click_plugins-1.1.1-py2.py3-none-any.whl
+Requirement already satisfied, skipping upgrade: six>=1.7 in /opt/conda/lib/python3.7/site-packages (from fiona) (1.12.0)
+Requirement already satisfied, skipping upgrade: attrs>=17 in /opt/conda/lib/python3.7/site-packages (from fiona) (19.1.0)
+Requirement already satisfied, skipping upgrade: click<8,>=4.0 in /opt/conda/lib/python3.7/site-packages (from fiona) (7.0)
+Collecting munch (from fiona)
+  Downloading https://files.pythonhosted.org/packages/68/f4/260ec98ea840757a0da09e0ed8135333d59b8dfebe9752a365b04857660a/munch-2.3.2.tar.gz
+Collecting cligj>=0.5 (from fiona)
+  Downloading https://files.pythonhosted.org/packages/e4/be/30a58b4b0733850280d01f8bd132591b4668ed5c7046761098d665ac2174/cligj-0.5.0-py3-none-any.whl
+Collecting pyproj (from geopandas)
+  Downloading https://files.pythonhosted.org/packages/8c/db/9dee33ae6d3270ecef262d2c5e55ae2a8f8eada4f25d8f54bbf3a89f5f10/pyproj-2.3.1-cp37-cp37m-manylinux1_x86_64.whl (9.8MB)
+Collecting shapely (from geopandas)
+  Downloading https://files.pythonhosted.org/packages/97/36/1af447160f713d72f35dd7e749788367b7a13285c4af2fbd675128aa4e99/Shapely-1.6.4.post2-cp37-cp37m-manylinux1_x86_64.whl (1.5MB)
+Requirement already satisfied, skipping upgrade: wheel>=0.23.0 in /opt/conda/lib/python3.7/site-packages (from pyLDAvis) (0.33.4)
+Requirement already satisfied, skipping upgrade: joblib>=0.8.4 in /opt/conda/lib/python3.7/site-packages (from pyLDAvis) (0.13.2)
+Requirement already satisfied, skipping upgrade: jinja2>=2.7.2 in /opt/conda/lib/python3.7/site-packages (from pyLDAvis) (2.10.1)
+Requirement already satisfied, skipping upgrade: numexpr in /opt/conda/lib/python3.7/site-packages (from pyLDAvis) (2.6.9)
+Collecting pytest (from pyLDAvis)
+  Downloading https://files.pythonhosted.org/packages/2f/19/d5f71752f71451ccc5ed5f6739e9da4a235f38783fdaf3629cae41b2ca7b/pytest-5.1.2-py3-none-any.whl (224kB)
+Collecting future (from pyLDAvis)
+  Downloading https://files.pythonhosted.org/packages/90/52/e20466b85000a181e1e144fd8305caf2cf475e2f9674e797b222f8105f5f/future-0.17.1.tar.gz (829kB)
+Collecting funcy (from pyLDAvis)
+  Downloading https://files.pythonhosted.org/packages/eb/3a/fc8323f913e8a9c6f33f7203547f8a2171223da5ed965f2541dafb10aa09/funcy-1.13-py2.py3-none-any.whl
+Collecting smart-open>=1.7.0 (from gensim)
+  Downloading https://files.pythonhosted.org/packages/37/c0/25d19badc495428dec6a4bf7782de617ee0246a9211af75b302a2681dea7/smart_open-1.8.4.tar.gz (63kB)
+Collecting branca>=0.3.0 (from folium)
+  Downloading https://files.pythonhosted.org/packages/63/36/1c93318e9653f4e414a2e0c3b98fc898b4970e939afeedeee6075dd3b703/branca-0.3.1-py3-none-any.whl
+Requirement already satisfied, skipping upgrade: python-dateutil>=2.6.1 in /opt/conda/lib/python3.7/site-packages (from pandas->qeds) (2.8.0)
+Requirement already satisfied, skipping upgrade: pytz>=2017.2 in /opt/conda/lib/python3.7/site-packages (from pandas->qeds) (2019.2)
+Requirement already satisfied, skipping upgrade: certifi>=2017.4.17 in /opt/conda/lib/python3.7/site-packages (from requests->qeds) (2019.9.11)
+Requirement already satisfied, skipping upgrade: idna<2.9,>=2.5 in /opt/conda/lib/python3.7/site-packages (from requests->qeds) (2.8)
+Requirement already satisfied, skipping upgrade: chardet<3.1.0,>=3.0.2 in /opt/conda/lib/python3.7/site-packages (from requests->qeds) (3.0.4)
+Requirement already satisfied, skipping upgrade: urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 in /opt/conda/lib/python3.7/site-packages (from requests->qeds) (1.25.3)
+Collecting inflection>=0.3.1 (from quandl->qeds)
+  Downloading https://files.pythonhosted.org/packages/d5/35/a6eb45b4e2356fe688b21570864d4aa0d0a880ce387defe9c589112077f8/inflection-0.3.1.tar.gz
+Collecting more-itertools<=5.0.0 (from quandl->qeds)
+  Downloading https://files.pythonhosted.org/packages/a4/a6/42f17d065bda1fac255db13afc94c93dbfb64393eae37c749b4cb0752fc7/more_itertools-5.0.0-py3-none-any.whl (52kB)
+Collecting ndg-httpsclient (from quandl->qeds)
+  Downloading https://files.pythonhosted.org/packages/fb/67/c2f508c00ed2a6911541494504b7cac16fe0b0473912568df65fd1801132/ndg_httpsclient-0.5.1-py3-none-any.whl
+Collecting pyasn1 (from quandl->qeds)
+  Downloading https://files.pythonhosted.org/packages/a1/71/8f0d444e3a74e5640a3d5d967c1c6b015da9c655f35b2d308a55d907a517/pyasn1-0.4.7-py2.py3-none-any.whl (76kB)
+Requirement already satisfied, skipping upgrade: pyOpenSSL in /opt/conda/lib/python3.7/site-packages (from quandl->qeds) (19.0.0)
+Requirement already satisfied, skipping upgrade: numba>=0.38 in /opt/conda/lib/python3.7/site-packages (from quantecon->qeds) (0.45.1)
+Requirement already satisfied, skipping upgrade: sympy in /opt/conda/lib/python3.7/site-packages (from quantecon->qeds) (1.4)
+Requirement already satisfied, skipping upgrade: cycler>=0.10 in /opt/conda/lib/python3.7/site-packages (from matplotlib->qeds) (0.10.0)
+Requirement already satisfied, skipping upgrade: pyparsing!=2.0.4,!=2.1.2,!=2.1.6,>=2.0.1 in /opt/conda/lib/python3.7/site-packages (from matplotlib->qeds) (2.4.2)
+Requirement already satisfied, skipping upgrade: kiwisolver>=1.0.1 in /opt/conda/lib/python3.7/site-packages (from matplotlib->qeds) (1.1.0)
+Collecting jdcal (from openpyxl->qeds)
+  Downloading https://files.pythonhosted.org/packages/f0/da/572cbc0bc582390480bbd7c4e93d14dc46079778ed915b505dc494b37c57/jdcal-1.4.1-py2.py3-none-any.whl
+Collecting et_xmlfile (from openpyxl->qeds)
+  Downloading https://files.pythonhosted.org/packages/22/28/a99c42aea746e18382ad9fb36f64c1c1f04216f41797f2f0fa567da11388/et_xmlfile-1.0.1.tar.gz
+Collecting retrying>=1.3.3 (from plotly->qeds)
+  Downloading https://files.pythonhosted.org/packages/44/ef/beae4b4ef80902f22e3af073397f079c96969c69b2c7d52a57ea9ae61c9d/retrying-1.3.3.tar.gz
+Collecting lxml (from pandas_datareader->qeds)
+  Downloading https://files.pythonhosted.org/packages/e7/a8/40115c84414c017e1a293f331709eb7534303d3ccd11ef805ac09b1481e7/lxml-4.4.1-cp37-cp37m-manylinux1_x86_64.whl (5.7MB)
+Collecting wrapt (from pandas_datareader->qeds)
+  Downloading https://files.pythonhosted.org/packages/23/84/323c2415280bc4fc880ac5050dddfb3c8062c2552b34c2e512eb4aa68f79/wrapt-1.11.2.tar.gz
+Requirement already satisfied, skipping upgrade: patsy>=0.4.0 in /opt/conda/lib/python3.7/site-packages (from statsmodels->qeds) (0.5.1)
+Requirement already satisfied, skipping upgrade: MarkupSafe>=0.23 in /opt/conda/lib/python3.7/site-packages (from jinja2>=2.7.2->pyLDAvis) (1.1.1)
+Requirement already satisfied, skipping upgrade: wcwidth in /opt/conda/lib/python3.7/site-packages (from pytest->pyLDAvis) (0.1.7)
+Collecting importlib-metadata>=0.12; python_version < "3.8" (from pytest->pyLDAvis)
+  Downloading https://files.pythonhosted.org/packages/f6/d2/40b3fa882147719744e6aa50ac39cf7a22a913cbcba86a0371176c425a3b/importlib_metadata-0.23-py2.py3-none-any.whl
+Collecting atomicwrites>=1.0 (from pytest->pyLDAvis)
+  Downloading https://files.pythonhosted.org/packages/52/90/6155aa926f43f2b2a22b01be7241be3bfd1ceaf7d0b3267213e8127d41f4/atomicwrites-1.3.0-py2.py3-none-any.whl
+Requirement already satisfied, skipping upgrade: packaging in /opt/conda/lib/python3.7/site-packages (from pytest->pyLDAvis) (19.0)
+Collecting pluggy<1.0,>=0.12 (from pytest->pyLDAvis)
+  Downloading https://files.pythonhosted.org/packages/92/c7/48439f7d5fd6bddb4c04b850bb862b42e3e2b98570040dfaf68aedd8114b/pluggy-0.13.0-py2.py3-none-any.whl
+Collecting py>=1.5.0 (from pytest->pyLDAvis)
+  Downloading https://files.pythonhosted.org/packages/76/bc/394ad449851729244a97857ee14d7cba61ddb268dce3db538ba2f2ba1f0f/py-1.8.0-py2.py3-none-any.whl (83kB)
+Collecting boto>=2.32 (from smart-open>=1.7.0->gensim)
+  Downloading https://files.pythonhosted.org/packages/23/10/c0b78c27298029e4454a472a1919bde20cb182dab1662cec7f2ca1dcc523/boto-2.49.0-py2.py3-none-any.whl (1.4MB)
+Collecting boto3 (from smart-open>=1.7.0->gensim)
+  Downloading https://files.pythonhosted.org/packages/96/75/53b5893332f783e42e418ee2b9e3f2d81e079b594aed4cfafa5791c83306/boto3-1.9.229-py2.py3-none-any.whl (128kB)
+Requirement already satisfied, skipping upgrade: cryptography>=2.3 in /opt/conda/lib/python3.7/site-packages (from pyOpenSSL->quandl->qeds) (2.7)
+Requirement already satisfied, skipping upgrade: llvmlite>=0.29.0dev0 in /opt/conda/lib/python3.7/site-packages (from numba>=0.38->quantecon->qeds) (0.29.0)
+Requirement already satisfied, skipping upgrade: mpmath>=0.19 in /opt/conda/lib/python3.7/site-packages (from sympy->quantecon->qeds) (1.1.0)
+Requirement already satisfied, skipping upgrade: setuptools in /opt/conda/lib/python3.7/site-packages (from kiwisolver>=1.0.1->matplotlib->qeds) (41.0.1)
+Collecting zipp>=0.5 (from importlib-metadata>=0.12; python_version < "3.8"->pytest->pyLDAvis)
+  Downloading https://files.pythonhosted.org/packages/74/3d/1ee25a26411ba0401b43c6376d2316a71addcc72ef8690b101b4ea56d76a/zipp-0.6.0-py2.py3-none-any.whl
+Collecting s3transfer<0.3.0,>=0.2.0 (from boto3->smart-open>=1.7.0->gensim)
+  Downloading https://files.pythonhosted.org/packages/16/8a/1fc3dba0c4923c2a76e1ff0d52b305c44606da63f718d14d3231e21c51b0/s3transfer-0.2.1-py2.py3-none-any.whl (70kB)
+Collecting jmespath<1.0.0,>=0.7.1 (from boto3->smart-open>=1.7.0->gensim)
+  Downloading https://files.pythonhosted.org/packages/83/94/7179c3832a6d45b266ddb2aac329e101367fbdb11f425f13771d27f225bb/jmespath-0.9.4-py2.py3-none-any.whl
+Collecting botocore<1.13.0,>=1.12.229 (from boto3->smart-open>=1.7.0->gensim)
+  Downloading https://files.pythonhosted.org/packages/30/a1/05b1f2067b22ba1a36ba2e5af89308ea630f69700466b7e78fb1b85121c3/botocore-1.12.229-py2.py3-none-any.whl (5.7MB)
+Requirement already satisfied, skipping upgrade: cffi!=1.11.3,>=1.8 in /opt/conda/lib/python3.7/site-packages (from cryptography>=2.3->pyOpenSSL->quandl->qeds) (1.12.3)
+Requirement already satisfied, skipping upgrade: asn1crypto>=0.21.0 in /opt/conda/lib/python3.7/site-packages (from cryptography>=2.3->pyOpenSSL->quandl->qeds) (0.24.0)
+Collecting docutils<0.16,>=0.10 (from botocore<1.13.0,>=1.12.229->boto3->smart-open>=1.7.0->gensim)
+  Downloading https://files.pythonhosted.org/packages/22/cd/a6aa959dca619918ccb55023b4cb151949c64d4d5d55b3f4ffd7eee0c6e8/docutils-0.15.2-py3-none-any.whl (547kB)
+Requirement already satisfied, skipping upgrade: pycparser in /opt/conda/lib/python3.7/site-packages (from cffi!=1.11.3,>=1.8->cryptography>=2.3->pyOpenSSL->quandl->qeds) (2.19)
+Building wheels for collected packages: qeds, pyLDAvis, quantecon, openpyxl, munch, future, smart-open, inflection, et-xmlfile, retrying, wrapt
+  Building wheel for qeds (setup.py): started
+  Building wheel for qeds (setup.py): finished with status 'done'
+  Created wheel for qeds: filename=qeds-0.5.2-cp37-none-any.whl size=27833 sha256=f4de9db9387668d880121018db63f8fb06d315feb7948b943e0b5910df8fc97c
+  Stored in directory: /home/jovyan/.cache/pip/wheels/04/dd/7f/dee67259f75ae0e637025d0eadd57df89798026a33e34abd52
+  Building wheel for pyLDAvis (setup.py): started
+  Building wheel for pyLDAvis (setup.py): finished with status 'done'
+  Created wheel for pyLDAvis: filename=pyLDAvis-2.1.2-py2.py3-none-any.whl size=97712 sha256=8d46a01ddbb719b2d943466e3ffd9dcc3f34ea80a3dc7ac0197c32efc20f5538
+  Stored in directory: /home/jovyan/.cache/pip/wheels/98/71/24/513a99e58bb6b8465bae4d2d5e9dba8f0bef8179e3051ac414
+  Building wheel for quantecon (setup.py): started
+  Building wheel for quantecon (setup.py): finished with status 'done'
+  Created wheel for quantecon: filename=quantecon-0.4.5-cp37-none-any.whl size=166733 sha256=f606c1269ebc4268f9fbeccadd07fdc3920d85f4eacfe9fda4d885ff4765dcf4
+  Stored in directory: /home/jovyan/.cache/pip/wheels/cf/80/42/ea1feb22ce8fd1f2f230bcce9c104c490fa376a01c8e9faf79
+  Building wheel for openpyxl (setup.py): started
+  Building wheel for openpyxl (setup.py): finished with status 'done'
+  Created wheel for openpyxl: filename=openpyxl-2.6.3-py2.py3-none-any.whl size=245700 sha256=efba9431b8f4eb8e20a5af9b5fd513d93f37ef7135b814c2458cb78fde10cbc7
+  Stored in directory: /home/jovyan/.cache/pip/wheels/51/fa/dc/7eb403214c40a01befafce3ec0d215176d451d106a431d6781
+  Building wheel for munch (setup.py): started
+  Building wheel for munch (setup.py): finished with status 'done'
+  Created wheel for munch: filename=munch-2.3.2-py2.py3-none-any.whl size=6613 sha256=e9a767c0fabd870a20295b15dec37f7d735af75df31c8111aafe80c4ab135992
+  Stored in directory: /home/jovyan/.cache/pip/wheels/db/bf/bc/06a3e1bfe0ab27d2e720ceb3cff3159398d92644c0cec2c125
+  Building wheel for future (setup.py): started
+  Building wheel for future (setup.py): finished with status 'done'
+  Created wheel for future: filename=future-0.17.1-cp37-none-any.whl size=488730 sha256=12d834efcd455695870b3cbd420831ba361cceebea5414a34090b28fd910c0f0
+  Stored in directory: /home/jovyan/.cache/pip/wheels/0c/61/d2/d6b7317325828fbb39ee6ad559dbe4664d0896da4721bf379e
+  Building wheel for smart-open (setup.py): started
+  Building wheel for smart-open (setup.py): finished with status 'done'
+  Created wheel for smart-open: filename=smart_open-1.8.4-cp37-none-any.whl size=68201 sha256=8a587f44cc8cab6ce3885c052e33b778d7b9889ac402857c1a20f2f3730008a7
+  Stored in directory: /home/jovyan/.cache/pip/wheels/5f/ea/fb/5b1a947b369724063b2617011f1540c44eb00e28c3d2ca8692
+  Building wheel for inflection (setup.py): started
+  Building wheel for inflection (setup.py): finished with status 'done'
+  Created wheel for inflection: filename=inflection-0.3.1-cp37-none-any.whl size=6076 sha256=18148f844b1f4723a58db232d0f87c6f74a4f5c422de8986b854f9efe3ea220f
+  Stored in directory: /home/jovyan/.cache/pip/wheels/9f/5a/d3/6fc3bf6516d2a3eb7e18f9f28b472110b59325f3f258fe9211
+  Building wheel for et-xmlfile (setup.py): started
+  Building wheel for et-xmlfile (setup.py): finished with status 'done'
+  Created wheel for et-xmlfile: filename=et_xmlfile-1.0.1-cp37-none-any.whl size=8914 sha256=7c07f7c4ae6decf006fbe71ce33430158932866cf1dd3dd2e3e64791b10d45ed
+  Stored in directory: /home/jovyan/.cache/pip/wheels/2a/77/35/0da0965a057698121fc7d8c5a7a9955cdbfb3cc4e2423cad39
+  Building wheel for retrying (setup.py): started
+  Building wheel for retrying (setup.py): finished with status 'done'
+  Created wheel for retrying: filename=retrying-1.3.3-cp37-none-any.whl size=11428 sha256=acfff8af52f0a4cd4131e03a6b74e3a77cd80c41e0601550aee1152334098297
+  Stored in directory: /home/jovyan/.cache/pip/wheels/d7/a9/33/acc7b709e2a35caa7d4cae442f6fe6fbf2c43f80823d46460c
+  Building wheel for wrapt (setup.py): started
+  Building wheel for wrapt (setup.py): finished with status 'done'
+  Created wheel for wrapt: filename=wrapt-1.11.2-cp37-cp37m-linux_x86_64.whl size=70693 sha256=db86376a5d1ff5f018e85d127a4f88d4a69489d245d7a40bf8fbe2f950fc82e0
+  Stored in directory: /home/jovyan/.cache/pip/wheels/d7/de/2e/efa132238792efb6459a96e85916ef8597fcb3d2ae51590dfd
+Successfully built qeds pyLDAvis quantecon openpyxl munch future smart-open inflection et-xmlfile retrying wrapt
+Installing collected packages: inflection, more-itertools, pyasn1, ndg-httpsclient, quandl, quantecon, pyarrow, jdcal, et-xmlfile, openpyxl, retrying, plotly, lxml, wrapt, pandas-datareader, qeds, click-plugins, munch, cligj, fiona, pyproj, shapely, geopandas, zipp, importlib-metadata, atomicwrites, pluggy, py, pytest, future, funcy, pyLDAvis, boto, jmespath, docutils, botocore, s3transfer, boto3, smart-open, gensim, branca, folium, xgboost, descartes
+Successfully installed atomicwrites-1.3.0 boto-2.49.0 boto3-1.9.229 botocore-1.12.229 branca-0.3.1 click-plugins-1.1.1 cligj-0.5.0 descartes-1.1.0 docutils-0.15.2 et-xmlfile-1.0.1 fiona-1.8.6 folium-0.10.0 funcy-1.13 future-0.17.1 gensim-3.8.0 geopandas-0.5.1 importlib-metadata-0.23 inflection-0.3.1 jdcal-1.4.1 jmespath-0.9.4 lxml-4.4.1 more-itertools-5.0.0 munch-2.3.2 ndg-httpsclient-0.5.1 openpyxl-2.6.3 pandas-datareader-0.7.4 plotly-4.1.1 pluggy-0.13.0 py-1.8.0 pyLDAvis-2.1.2 pyarrow-0.14.1 pyasn1-0.4.7 pyproj-2.3.1 pytest-5.1.2 qeds-0.5.2 quandl-3.4.8 quantecon-0.4.5 retrying-1.3.3 s3transfer-0.2.1 shapely-1.6.4.post2 smart-open-1.8.4 wrapt-1.11.2 xgboost-0.90 zipp-0.6.0
+Removing intermediate container 1bef1c8201a2
+ ---> 76656d318f75
+Step 34/46 : RUN conda install -c conda-forge nodejs &&     jupyter labextension install @jupyterlab/toc  --no-build &&     jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build &&     jupyter labextension install plotlywidget@1.1.1 --no-build &&     jupyter labextension install jupyterlab-plotly@1.1.2 --no-build &&     jupyter lab build --dev-build=False &&     npm cache clean --force
+ ---> Running in ade16490c21e
+Collecting package metadata (current_repodata.json): ...working... done
+Solving environment: ...working... done
+
+# All requested packages already installed.
+
+[91m
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.7.10
+  latest version: 4.7.12
+
+Please update conda by running
+
+    $ conda update -n base conda
+
+
+[0m-/|\-/|\-/|\-/|\-/|-/|\-/|\-/|\-/|\-/|\-/-/|\-/|\-/|\-/|\-/|\-/-/|\-/|\-/|\[91m[LabBuildApp] JupyterLab 1.0.4
+[0m[91m[LabBuildApp] Building in /opt/conda/share/jupyter/lab
+[0m[91m[LabBuildApp] Building jupyterlab assets
+[0m-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\--/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-/|\-[91mnpm[0m[91m WARN using --force I sure hope you know what you are doing.
+[0mRemoving intermediate container ade16490c21e
+ ---> 9a0290e7c069
+Step 35/46 : ENV NB_USER=jupyter     NB_UID=9999
+ ---> Running in 13b704d0f32f
+Removing intermediate container 13b704d0f32f
+ ---> 7dd808023d85
+Step 36/46 : ENV HOME=/home/$NB_USER
+ ---> Running in 9a68c580711c
+Removing intermediate container 9a68c580711c
+ ---> 2bee896bd5d7
+Step 37/46 : ENV JULIA_DEPOT_PATH="/home/jupyter/.julia:/opt/julia"
+ ---> Running in a22305ae8e0d
+Removing intermediate container a22305ae8e0d
+ ---> 6452050a865b
+Step 38/46 : ADD startup.jl /opt/julia-1.2.0/etc/julia/startup.jl
+ ---> 53a1af8c72ac
+Step 39/46 : RUN julia /opt/julia-1.2.0/etc/julia/startup.jl
+ ---> Running in 490064483f4a
+Activating environment at `/opt/julia/environments/v1.2/Project.toml`
+seeded
+Activating environment at `~/.julia/environments/v1.2/Project.toml`
+Removing intermediate container 490064483f4a
+ ---> 047c9fefeab9
+Step 40/46 : ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ HOME=/home/$NB_USER
+ ---> Running in 31971ebbb440
+Removing intermediate container 31971ebbb440
+ ---> 1836692f4124
+Step 41/46 : WORKDIR $HOME
+ ---> Running in 9dfb40c648fc
+Removing intermediate container 9dfb40c648fc
+ ---> c10cf57834f7
+Step 42/46 : USER root
+ ---> Running in 5614f290ffd4
+Removing intermediate container 5614f290ffd4
+ ---> 3bea24090020
+Step 43/46 : RUN chown -R jupyter /home/jupyter/.julia
+ ---> Running in a49183a39ef2
+Removing intermediate container a49183a39ef2
+ ---> abf0ef6ab629
+Step 44/46 : RUN conda install -c conda-forge nbgitpuller
+ ---> Running in b89e07969f25
+Collecting package metadata (current_repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /opt/conda
+
+  added / updated specs:
+    - nbgitpuller
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    nbgitpuller-0.7.2          |             py_0          15 KB  conda-forge
+    ------------------------------------------------------------
+                                           Total:          15 KB
+
+The following NEW packages will be INSTALLED:
+
+  nbgitpuller        conda-forge/noarch::nbgitpuller-0.7.2-py_0
+
+
+Proceed ([y]/n)? 
+
+Downloading and Extracting Packages
+nbgitpuller-0.7.2    | 15 KB     |            |   0% nbgitpuller-0.7.2    | 15 KB     | ########## | 100% 
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done
+[91m
+
+==> WARNING: A newer version of conda exists. <==
+  current version: 4.7.10
+  latest version: 4.7.12
+
+Please update conda by running
+
+    $ conda update -n base conda
+
+
+[0mRemoving intermediate container b89e07969f25
+ ---> fb81bb51fcf0
+Step 45/46 : USER jupyter
+ ---> Running in e3b3be894c8c
+Removing intermediate container e3b3be894c8c
+ ---> c882da657817
+Step 46/46 : RUN julia -e "using Pkg; pkg\"add OffsetArrays DiffEqBase DiffEqCallbacks DiffEqJump DifferentialEquations StochasticDiffEq IteratorInterfaceExtensions DiffEqOperators\""
+ ---> Running in 9d8ae834bfc7
+Activating environment at `~/.julia/environments/v1.2/Project.toml`
+ Resolving package versions...
+[91mERROR: [0m[91mIOError: stat: permission denied (EACCES)[0m[91m
+Stacktrace:[0m[91m
+ [1] [0m[91mstat[0m[91m([0m[91m::[0m[91mString) at ./stat.jl:68
+ [2] [0m[91misfile at ./stat.jl:309 [inlined]
+ [3] #projectfile_path#32(::[0m[91mBool, ::[0m[91mtypeof([0m[91mPkg.Types.projectfile_path[0m[91m)[0m[91m, ::String) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/Types.jl:193
+ [4] #projectfile_path at ./none:0 [inlined]
+ [5] collect_project!(::[0m[91mPkg.Types.Context, ::[0m[91mPkg.Types.PackageSpec, ::String, ::[0m[91mDict{[0m[91mBase.UUID,[0m[91mArray{Pkg.Types.PackageSpec,[0m[91m1}}) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/Operations.jl:220
+ [6] collect_fixed!(::[0m[91mPkg.Types.Context, ::[0m[91mArray{[0m[91mPkg.Types.PackageSpec,1}, ::[0m[91mDict{Base.UUID,String}) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/Operations.jl:251
+ [7] resolve_versions!(::[0m[91mPkg.Types.Context, ::Array{Pkg.Types.PackageSpec,[0m[91m1})[0m[91m at [0m[91m/buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/Operations.jl:291
+ [8] #add#100(::Bool, ::[0m[91mtypeof(Pkg.Operations.add), ::Pkg.Types.Context, ::Array{Pkg.Types.PackageSpec,1}, ::[0m[91mArray{Base.UUID,1}) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/Operations.jl:962[0m[91m
+ [9] #add at ./none:0 [inlined][0m[91m
+ [10] [0m[91m#add#25(::Bool, ::[0m[91mBase.Iterators.Pairs{[0m[91mUnion{},Union{},[0m[91mTuple{},[0m[91mNamedTuple{[0m[91m([0m[91m),Tuple{}}}, ::[0m[91mtypeof(Pkg.API.add), ::Pkg.Types.Context, [0m[91m::Array{Pkg.Types.PackageSpec,[0m[91m1}[0m[91m) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/API.jl:99
+ [11] add at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/API.jl:69 [inlined]
+ [12] do_add!(::[0m[91mDict{[0m[91mSymbol,[0m[91mAny}, ::Array{Pkg.Types.PackageSpec,1}, ::Dict{Symbol,[0m[91mAny}) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/REPLMode.jl:496[0m[91m
+ [13] #invokelatest#1(::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}, [0m[91m::[0m[91mtypeof(Base.invokelatest), ::Any, ::Any, ::[0m[91mVararg{Any,[0m[91mN} where N) at ./essentials.jl:790
+ [14] invokelatest(::Any, ::Any, ::[0m[91mVararg{Any,N}[0m[91m where N) at [0m[91m./essentials.jl:789[0m[91m
+ [15] do_cmd!(::[0m[91mPkg.REPLMode.Command, ::[0m[91mPkg.REPLMode.MiniREPL) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/REPLMode.jl:403
+ [16] #do_cmd#23(::Bool, ::[0m[91mtypeof(Pkg.REPLMode.do_cmd), ::Pkg.REPLMode.MiniREPL, ::[0m[91mString) at /buildworker/worker/package_linux64/build/usr/share/julia/stdlib/v1.2/Pkg/src/REPLMode.jl:382
+ [17] [0m[91m(::getfield(Pkg.REPLMode, Symbol("#kw##do_cmd")))(::[0m[91mNamedTuple{[0m[91m([0m[91m:[0m[91mdo_rethrow,),[0m[91mTuple{Bool}}, ::typeof(Pkg.REPLMode.do_cmd), ::Pkg.REPLMode.MiniREPL, ::[0m[91mString) at ./none:0[0m[91m
+ [18] top-level scope at none:1
+[0mThe command '/bin/sh -c julia -e "using Pkg; pkg\"add OffsetArrays DiffEqBase DiffEqCallbacks DiffEqJump DifferentialEquations StochasticDiffEq IteratorInterfaceExtensions DiffEqOperators\""' returned a non-zero code: 1
