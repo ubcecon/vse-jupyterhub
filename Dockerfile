@@ -146,3 +146,7 @@ USER jupyter
 RUN julia -e "using Pkg; pkg\"add OffsetArrays DiffEqBase DiffEqCallbacks DiffEqJump DifferentialEquations StochasticDiffEq IteratorInterfaceExtensions DiffEqOperators\""
 RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); packages_to_default_environment()"
 RUN julia -e "using Pkg; pkg\"instantiate\""
+RUN pip install nltk
+
+# Additional changes 
+RUN julia -e "using Pkg; pkg\"up Optim\"; pkg\"add ApproxFun BlockBandedMatrices Convex ECOS\""
