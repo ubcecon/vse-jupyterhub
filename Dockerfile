@@ -150,3 +150,10 @@ RUN pip install nltk
 
 # Additional changes 
 RUN julia -e "using Pkg; pkg\"up Optim\"; pkg\"add ApproxFun BlockBandedMatrices Convex ECOS\""
+
+# KNITRO stuff
+RUN mkdir ~/.knitro && cd ~/.knitro && pwd && wget -qO- https://s3-us-west-2.amazonaws.com/jesseperla.com/knitro/knitro-12.0.0-z-Linux-64.tar.gz | tar -xzv
+ENV KNITRODIR="/home/jupyter/.knitro/knitro-12.0.0-z-Linux-64"
+ENV ARTELYS_LICENSE_NETWORK_ADDR="turtle.econ.ubc.ca:8349"
+ENV LD_LIBRARY_PATH="$KNITRODIR/lib"
+RUN julia -e "using Pkg; pkg\"add KNITRO\"; pkg\"test KNITRO\""
