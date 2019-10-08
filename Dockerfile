@@ -112,7 +112,7 @@ RUN sudo apt-get update && apt-get install -y --no-install-recommends unzip \
     librsvg2-dev \
     libcairo2-dev \
     libpango1.0-0 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, install = true); cp(syso, sysold, force = true)" 
 RUN julia -e "using Pkg; pkg\"precompile\""
 RUN julia -e "using Pkg; pkg\"rm PackageCompiler\"; pkg\"gc\""    
