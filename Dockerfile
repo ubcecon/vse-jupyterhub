@@ -97,6 +97,7 @@ RUN mkdir /etc/julia && \
 USER jovyan 
 
 # PackageCompiler step 
+RUN sudo apt-get install -y gettext
 RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
 RUN julia -e "using Pkg; pkg\"add PackageCompiler#sd-notomls\""
 RUN julia -e "using Pkg; pkg\"add GR Plots\""    
