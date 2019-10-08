@@ -60,7 +60,7 @@ RUN sudo sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/loc
 
 # Python extras 
 RUN conda install python-graphviz && \ 
-    pip install qeds fiona geopandas pyLDAvis gensim folium xgboost descartes pyarrow nbgitpuller --upgrade
+    pip install qeds fiona geopandas pyLDAvis gensim folium xgboost descartes pyarrow nbgitpuller nltk --upgrade
 
 # JupyterLab extensions
 RUN conda install -c conda-forge nodejs && \ 
@@ -70,10 +70,7 @@ RUN conda install -c conda-forge nodejs && \
     jupyter labextension install jupyterlab-plotly@1.1.2 --no-build && \ 
     jupyter lab build --dev-build=False && \ 
     npm cache clean --force
-
-RUN pip install nltk
-
-
+    
 # Julia install 
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
