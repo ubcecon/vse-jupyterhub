@@ -101,7 +101,6 @@ RUN sudo apt-get install -y gettext
 RUN julia -e "using Pkg; pkg\"add InstantiateFromURL\""
 RUN julia -e "using Pkg; pkg\"add PackageCompiler#sd-notomls\""
 RUN julia -e "using Pkg; pkg\"add GR Plots\""    
-RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests GeometryTypes\"" 
 RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends unzip \
     gettext \
     zlib1g-dev \
@@ -114,7 +113,8 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends unzip
     libpango1.0-0 \
     xvfb xserver-xephyr vnc4server \ 
     && sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
-RUN julia -e "using Pkg; pkg\"add Gtk\""
+RUN julia -e "using Pkg; pkg\"add IJulia Images DualNumbers Unitful Compat LaTeXStrings UnicodePlots DataValues IterativeSolvers VisualRegressionTests GeometryTypes\"" 
+RUN julia -e "using Pkg; pkg\"add StatsPlots DataFrames CSV PlotUtils GeometryTypes Tables CategoricalArrays IteratorInterfaceExtensions PooledArrays WeakRefStrings\""
 RUN julia -e "using PackageCompiler; syso, sysold = PackageCompiler.compile_incremental(:Plots, install = true); cp(syso, sysold, force = true)" 
 RUN julia -e "using Pkg; pkg\"precompile\""
 RUN julia -e "using Pkg; pkg\"rm PackageCompiler\"; pkg\"gc\""    
