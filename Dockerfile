@@ -48,10 +48,15 @@ RUN apt-get update && \
     subversion \ 
     python-pandas
 
+# Sudo setup 
+ADD /sudoers.txt /etc/sudoers
+RUN chmod 440 /etc/sudoers
+
+
 # Fix SageMath Kernel
 USER jovyan 
 ENV CPATH=$CONDA_DIR/include
-RUN sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
+RUN sudo sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
 
 # Python extras 
 RUN conda install python-graphviz && \ 
@@ -81,9 +86,9 @@ RUN mkdir $HOME/opt/julia-${JULIA_VERSION} && \
     rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
 
 # Julia install setup stuff
-USER root 
 RUN sudo ln -fs $HOME/opt/julia-*/bin/julia /usr/local/bin/julia
 # Show Julia where conda libraries are 
+USER root
 RUN mkdir /etc/julia && \
     echo "push!(Libdl.DL_LOAD_PATH, \"$CONDA_DIR/lib\")" >> /etc/julia/juliarc.jl && \
     # Create JULIA_PKGDIR \
