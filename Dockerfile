@@ -1,6 +1,15 @@
 FROM jupyter/scipy-notebook:latest
 # For building on Xeon processors
 ARG OPENBLAS_CORETYPE=HASWELL
+USER root
+RUN useradd -m -s /bin/bash -N -u 9999 jupyter
+USER jupyter
+# Configure environment
+ENV NB_USER=jupyter \
+    NB_UID=9999
+ENV XDG_CACHE_HOME=/home/$NB_USER/.cache/ \
+    HOME=/home/$NB_USER
+WORKDIR $HOME
 
 # Core dependencies
 USER root
@@ -10,7 +19,7 @@ RUN apt-get update && \
     gfortran \
     gcc && \
     rm -rf /var/lib/apt/lists/*
-USER jovyan 
+USER jupyter 
 
 # R Stuff
 RUN conda install --quiet --yes \
@@ -54,7 +63,7 @@ RUN chmod 440 /etc/sudoers
 
 
 # Fix SageMath Kernel
-USER jovyan 
+USER jupyter 
 ENV CPATH=$CONDA_DIR/include
 RUN sudo sed -i 's/"\/usr\/bin\/sage"/"env", "PATH=\/usr\/local\/sbin:\/usr\/local\/bin:\/usr\/sbin:\/usr\/bin:\/sbin:\/bin", "\/usr\/bin\/sage"/' /usr/share/jupyter/kernels/sagemath/kernel.json
 
@@ -94,7 +103,7 @@ RUN mkdir /etc/julia && \
     fix-permissions $JULIA_PKGDIR
 
 # Julia packages
-USER jovyan 
+USER jupyter 
 
 # PackageCompiler step 
 RUN sudo apt-get install -y gettext
@@ -119,11 +128,15 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends unzip
 
 # Other packages
 RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.3.0\"); packages_to_default_environment()"
-RUN julia -e "using Pkg; pkg\"up Optim\"; pkg\"add ApproxFun BlockBandedMatrices Convex ECOS\""
+RUN julia -e "using Pkg; pkg\"up Optim\"; pkg\"add ApproxFun IJulia BlockBandedMatrices Convex ECOS\""
 
 # Knitro
 RUN mkdir ~/.knitro && cd ~/.knitro && pwd && wget -qO- https://s3-us-west-2.amazonaws.com/jesseperla.com/knitro/knitro-12.0.0-z-Linux-64.tar.gz | tar -xzv
-ENV KNITRODIR="/home/jovyan/.knitro/knitro-12.0.0-z-Linux-64"
+ENV KNITRODIR="/home/jupyter/.knitro/knitro-12.0.0-z-Linux-64"
 ENV ARTELYS_LICENSE_NETWORK_ADDR="turtle.econ.ubc.ca:8349"
 ENV LD_LIBRARY_PATH="$KNITRODIR/lib"
 RUN julia -e "using Pkg; pkg\"add KNITRO\"; pkg\"test KNITRO\""
+
+# Last-minute setup 
+RUN mkdir -p ~/work
+RUN rm ~/Project.toml ~/Manifest.toml
