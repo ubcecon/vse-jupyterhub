@@ -139,4 +139,6 @@ RUN julia -e "using Pkg; pkg\"add KNITRO\"; pkg\"test KNITRO\""
 
 # Last-minute setup 
 RUN rm ~/Project.toml ~/Manifest.toml
+USER root
 RUN julia -e "using Pkg; pkg\"build IJulia\""
+USER jupyter
