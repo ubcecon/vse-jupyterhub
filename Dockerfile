@@ -131,12 +131,13 @@ RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/qu
 RUN julia -e "using Pkg; pkg\"up Optim\"; pkg\"add ApproxFun IJulia BlockBandedMatrices Convex ECOS\""
 
 # Knitro
-RUN mkdir ~/.knitro && cd ~/.knitro && pwd && wget -qO- https://s3-us-west-2.amazonaws.com/jesseperla.com/knitro/knitro-12.0.0-z-Linux-64.tar.gz | tar -xzv
-ENV KNITRODIR="/home/jupyter/.knitro/knitro-12.0.0-z-Linux-64"
+RUN sudo mkdir /opt/knitro && cd /opt/knitro && pwd && wget -qO- https://s3-us-west-2.amazonaws.com/jesseperla.com/knitro/knitro-12.0.0-z-Linux-64.tar.gz | sudo tar -xzv
+ENV KNITRODIR="/opt/knitro/knitro-12.0.0-z-Linux-64"
 ENV ARTELYS_LICENSE_NETWORK_ADDR="turtle.econ.ubc.ca:8349"
 ENV LD_LIBRARY_PATH="$KNITRODIR/lib"
-RUN julia -e "using Pkg; pkg\"add KNITRO\"; pkg\"test KNITRO\""
+RUN julia -e "using Pkg; pkg\"add KNITRO\""
 
+RUN julia -e "using Pkg; pkg\"up Compat\"; pkg\"precompile\""
 # Last-minute setup 
 RUN rm ~/Project.toml ~/Manifest.toml
 
