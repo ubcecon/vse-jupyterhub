@@ -139,6 +139,7 @@ RUN julia -e "using Pkg; pkg\"add KNITRO\"; pkg\"test KNITRO\""
 
 # Last-minute setup 
 RUN rm ~/Project.toml ~/Manifest.toml
-USER root
-RUN julia -e "using Pkg; pkg\"build IJulia\""
-USER jupyter
+
+        RUN sudo  mv $HOME/.local/share/jupyter/kernels/julia* $CONDA_DIR/share/jupyter/kernels/ 
+            RUN  sudo chmod -R go+rx $CONDA_DIR/share/jupyter 
+                RUN  sudo rm -rf $HOME/.local 

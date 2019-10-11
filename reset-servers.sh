@@ -7,6 +7,6 @@ sudo docker rm $(sudo docker ps -aq)
 # Remove .julia directories 
 for d in /tank/home/*; do
   echo "cleaing $d"
-  cd $d && sudo rm -rf .julia
+  cd $d && sudo rm -rf .julia .jupyter .local .ipython
 done
 
