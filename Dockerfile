@@ -144,3 +144,5 @@ RUN rm ~/Project.toml ~/Manifest.toml
         RUN sudo  mv $HOME/.local/share/jupyter/kernels/julia* $CONDA_DIR/share/jupyter/kernels/ 
             RUN  sudo chmod -R go+rx $CONDA_DIR/share/jupyter 
                 RUN  sudo rm -rf $HOME/.local 
+
+ENV ARTELYS_LICENSE "/opt/knitro-license"
