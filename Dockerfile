@@ -129,6 +129,7 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends unzip
 # Other packages
 RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.4.0\"); packages_to_default_environment()"
 RUN julia -e "using Pkg; pkg\"up Optim\"; pkg\"add ApproxFun IJulia BlockBandedMatrices Convex ECOS\""
+RUN julia -e "using Pkg; pkg\"pin IJulia\""
 
 # Knitro
 RUN sudo mkdir /opt/knitro && cd /opt/knitro && pwd && wget -qO- https://s3-us-west-2.amazonaws.com/jesseperla.com/knitro/knitro-12.0.0-z-Linux-64.tar.gz | sudo tar -xzv
