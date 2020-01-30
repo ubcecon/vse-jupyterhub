@@ -83,11 +83,11 @@ RUN conda install -c conda-forge nodejs && \
 # Julia install 
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
-ENV JULIA_VERSION=1.2.0
+ENV JULIA_VERSION=1.3.1
 RUN sudo mkdir -p /opt/julia-${JULIA_VERSION} && \
     cd /tmp && \
     wget -q https://julialang-s3.julialang.org/bin/linux/x64/`echo ${JULIA_VERSION} | cut -d. -f 1,2`/julia-${JULIA_VERSION}-linux-x86_64.tar.gz && \
-    echo "926ced5dec5d726ed0d2919e849ff084a320882fb67ab048385849f9483afc47 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
+    echo "faa707c8343780a6fe5eaf13490355e8190acf8e2c189b9e7ecbddb0fa2643ad *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
     sudo tar xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia-${JULIA_VERSION} --strip-components=1 && \
     rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
 
@@ -127,7 +127,7 @@ RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends unzip
 # RUN julia -e "using Pkg; pkg\"rm PackageCompiler\"; pkg\"gc\""    
 
 # Other packages
-RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.4.0\"); packages_to_default_environment()"
+RUN julia -e "using InstantiateFromURL; using Pkg; github_project(\"QuantEcon/quantecon-notebooks-julia\", version = \"0.5.0\"); packages_to_default_environment()"
 RUN julia -e "using Pkg; pkg\"up Optim\"; pkg\"add ApproxFun IJulia BlockBandedMatrices Convex ECOS\""
 RUN julia -e "using Pkg; pkg\"pin IJulia\""
 RUN julia -e "usiing Pkg; pkg\"up\""
